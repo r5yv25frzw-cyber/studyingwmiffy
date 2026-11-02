@@ -736,7 +736,6 @@
                 explanation: 'FCF = 영업활동현금흐름 - CAPEX = 250억원 - 90억원 = 160억원',
                 formulaId: 'f_fcf'
             },
-            // Advanced Dupont Analysis Question Added
             {
                 id: 'q7_dupont',
                 part: 1,
@@ -780,7 +779,6 @@
                     const parsed = JSON.parse(raw);
                     appState = { ...appState, ...parsed };
                     
-                    // Reset daily count if date changed
                     const today = new Date().toISOString().slice(0, 10);
                     if (appState.lastDateStr !== today) {
                         appState.todaySolvedCount = 0;
@@ -791,7 +789,6 @@
                 }
             }
             
-            // Merge Custom Formulas & Questions into Global Arrays
             FORMULA_DB = [...DEFAULT_FORMULA_DB, ...(appState.customFormulas || [])];
             QUESTION_BANK = [...DEFAULT_QUESTION_BANK, ...(appState.customQuestions || [])];
             saveState();
@@ -802,7 +799,6 @@
             updateDashboardStats();
         }
 
-        // Export/Import JSON Data Functions
         function exportDataJSON() {
             const exportObj = {
                 version: '2.0',
@@ -851,7 +847,6 @@
             const btnBack = document.getElementById('btn-back');
             const titleEl = document.getElementById('header-title');
 
-            // Reset navbar highlighting
             document.querySelectorAll('nav button').forEach(btn => {
                 btn.classList.remove('text-brand-primary');
                 btn.classList.add('text-gray-400');
@@ -870,7 +865,6 @@
                 mainMod.classList.remove('hidden');
                 btnBack.classList.remove('hidden');
                 
-                // Highlight Nav Active
                 if (viewName === 'flashcard') document.getElementById('nav-item-flashcard').classList.add('text-brand-primary');
                 else if (viewName === 'calc_practice') document.getElementById('nav-item-calc').classList.add('text-brand-primary');
                 else if (viewName === 'wrong_notes') document.getElementById('nav-item-wrong').classList.add('text-brand-primary');
@@ -899,7 +893,6 @@
                 document.getElementById('nav-wrong-dot').classList.add('hidden');
             }
 
-            // Subject Progress
             const p1Total = QUESTION_BANK.filter(q => q.part === 1).length;
             const p1Solved = new Set(appState.solvedLogs.filter(l => {
                 const q = QUESTION_BANK.find(item => item.id === l.questionId);
@@ -921,7 +914,7 @@
         }
 
         /* ==========================================================================
-           4. MODULE RENDERING LOGIC (10 Core Modules)
+           4. MODULE RENDERING LOGIC
            ========================================================================== */
 
         function renderModuleView(viewName, params) {
@@ -964,7 +957,6 @@
             }
         }
 
-        /* Helper function to render Fraction in HTML */
         function renderFractionHTML(num, den) {
             if (!den || den === 'N/A' || den.trim() === '') {
                 return `<span class="font-bold text-brand-dark">${num}</span>`;
@@ -977,7 +969,7 @@
             `;
         }
 
-        /* ----- MODULE 1: TODAY MODULE ----- */
+        /* MODULE 1 */
         function renderTodayModule(container) {
             container.innerHTML = `
                 <div class="space-y-4">
@@ -998,7 +990,7 @@
             });
         }
 
-        /* ----- MODULE 2 & 3: PART 1 / PART 2 SUBJECT MODULE ----- */
+        /* MODULE 2 & 3 */
         function renderPartSubjectModule(container, partNum) {
             const filteredQuestions = QUESTION_BANK.filter(q => q.part === partNum);
             container.innerHTML = `
@@ -1022,13 +1014,12 @@
             });
         }
 
-        /* ----- MODULE 4: FLASHCARDS (WITH VISUAL FRACTION) ----- */
+        /* MODULE 4: FLASHCARDS */
         let flashcardIndex = 0;
         let isCardFlipped = false;
 
         function renderFlashcardModule(container) {
             const currentFormula = FORMULA_DB[flashcardIndex];
-            const isMastered = appState.masteredFormulas.includes(currentFormula.id);
 
             container.innerHTML = `
                 <div class="space-y-4">
@@ -1037,11 +1028,9 @@
                         <span class="text-xs font-bold text-brand-muted">${flashcardIndex + 1} / ${FORMULA_DB.length}</span>
                     </div>
 
-                    <!-- FLASHCARD CONTAINER -->
                     <div class="perspective-1000 w-full h-84 cursor-pointer" onclick="flipFlashcard()">
                         <div id="flashcard-inner" class="relative w-full h-full duration-500 transform-style-3d bg-white rounded-2xl shadow-md border-2 border-brand-primary p-5 flex flex-col justify-between transition-transform">
                             
-                            <!-- FRONT -->
                             <div class="absolute inset-0 p-5 flex flex-col justify-between backface-hidden bg-white rounded-2xl">
                                 <div class="flex justify-between items-center">
                                     <span class="text-xs font-bold px-2 py-1 bg-brand-soft text-brand-dark rounded-md">${currentFormula.cat}</span>
@@ -1056,7 +1045,6 @@
                                 </div>
                             </div>
 
-                            <!-- BACK (FRACTION FORMATTED) -->
                             <div class="absolute inset-0 p-5 flex flex-col justify-between backface-hidden rotate-y-180 bg-brand-dark text-white rounded-2xl overflow-y-auto no-scrollbar">
                                 <div class="flex justify-between items-center border-b border-gray-700 pb-2">
                                     <span class="text-xs font-bold text-brand-soft">${currentFormula.name}</span>
@@ -1082,7 +1070,6 @@
                         </div>
                     </div>
 
-                    <!-- ACTION BUTTONS -->
                     <div class="grid grid-cols-2 gap-3">
                         <button onclick="markFormulaStatus('${currentFormula.id}', false)" class="bg-red-50 text-red-600 border border-red-200 p-3 rounded-xl font-bold text-sm shadow-sm hover:bg-red-100 transition flex items-center justify-center space-x-1">
                             <i class="fa-solid fa-xmark"></i>
@@ -1094,7 +1081,6 @@
                         </button>
                     </div>
 
-                    <!-- CARD NAVIGATION -->
                     <div class="flex justify-between items-center pt-2">
                         <button onclick="prevFlashcard()" class="text-xs font-bold text-gray-600 bg-white px-3 py-2 rounded-xl border shadow-sm">
                             <i class="fa-solid fa-chevron-left mr-1"></i> 이전 카드
@@ -1145,11 +1131,10 @@
             nextFlashcard();
         }
 
-        /* ----- MODULE 11: ADMIN & CRUD MANAGER ----- */
+        /* MODULE 11: ADMIN CRUD */
         function renderAdminModule(container) {
             container.innerHTML = `
                 <div class="space-y-4">
-                    <!-- Tab Switcher -->
                     <div class="flex border-b border-gray-200 bg-white rounded-xl p-1 shadow-sm">
                         <button onclick="switchAdminTab('q')" id="admin-tab-q" class="flex-1 py-2 text-xs font-bold text-center rounded-lg bg-brand-primary text-white">
                             문제 관리 (${QUESTION_BANK.length})
@@ -1159,14 +1144,12 @@
                         </button>
                     </div>
 
-                    <!-- Question CRUD Area -->
                     <div id="admin-sec-q" class="space-y-3">
                         <button onclick="toggleAddQuestionForm()" class="w-full bg-brand-primary text-white font-bold py-2.5 rounded-xl text-xs shadow flex items-center justify-center space-x-1">
                             <i class="fa-solid fa-plus"></i>
                             <span>새 신용분석사 문제 추가</span>
                         </button>
                         
-                        <!-- ADD QUESTION FORM (Hidden by default) -->
                         <div id="form-add-q" class="hidden bg-white rounded-2xl p-4 shadow-sm border border-brand-primary space-y-3 text-xs">
                             <h4 class="font-bold text-sm text-brand-dark">새 문제 등록</h4>
                             <div class="grid grid-cols-2 gap-2">
@@ -1212,18 +1195,15 @@
                             </button>
                         </div>
 
-                        <!-- Question List -->
                         <div id="admin-q-list" class="space-y-2"></div>
                     </div>
 
-                    <!-- Formula CRUD Area -->
                     <div id="admin-sec-f" class="hidden space-y-3">
                         <button onclick="toggleAddFormulaForm()" class="w-full bg-brand-primary text-white font-bold py-2.5 rounded-xl text-xs shadow flex items-center justify-center space-x-1">
                             <i class="fa-solid fa-plus"></i>
                             <span>새 공식 지표 추가</span>
                         </button>
 
-                        <!-- ADD FORMULA FORM -->
                         <div id="form-add-f" class="hidden bg-white rounded-2xl p-4 shadow-sm border border-brand-primary space-y-3 text-xs">
                             <h4 class="font-bold text-sm text-brand-dark">새 공식 등록</h4>
                             <div>
@@ -1257,7 +1237,6 @@
                             </button>
                         </div>
 
-                        <!-- Formula List -->
                         <div id="admin-f-list" class="space-y-2"></div>
                     </div>
                 </div>
@@ -1428,7 +1407,7 @@
             });
         }
 
-        /* ----- MODULE 5: STEP-BY-STEP CALC PRACTICE ----- */
+        /* MODULE 5: CALC PRACTICE */
         let calcPracticeIndex = 0;
 
         function renderCalcPracticeModule(container) {
@@ -1448,13 +1427,11 @@
                         <p class="text-xs text-gray-500">공식을 상기하여 숫자를 대입하고 최종 답을 도출하세요.</p>
                     </div>
 
-                    <!-- STEP 1: FORMULA CHECK -->
                     <div class="bg-brand-bg p-3 rounded-xl border border-gray-200 text-xs space-y-1">
                         <span class="font-bold text-brand-dark block"><i class="fa-solid fa-list-ol text-brand-primary mr-1"></i>STEP 1. 필수 공식 확인</span>
                         <p class="font-mono text-brand-primary font-bold text-sm">${formulaObj.name}: ${formulaObj.formula}</p>
                     </div>
 
-                    <!-- STEP 2: INPUT ANSWER -->
                     <div class="space-y-2">
                         <label class="block text-xs font-bold text-gray-700"><i class="fa-solid fa-pen text-brand-primary mr-1"></i>STEP 2. 최종 계산 수치 입력</label>
                         <div class="flex space-x-2">
@@ -1465,7 +1442,6 @@
                         </div>
                     </div>
 
-                    <!-- EXPLANATION BOX (Hidden by default) -->
                     <div id="calc-practice-result" class="hidden p-3 rounded-xl text-xs space-y-2"></div>
 
                     <div class="flex justify-end pt-2">
@@ -1513,7 +1489,7 @@
             renderCalcPracticeModule(document.getElementById('view-module'));
         }
 
-        /* ----- MODULE 6: GENERATOR MODULE ----- */
+        /* MODULE 6: GENERATOR */
         function renderGeneratorModule(container) {
             container.innerHTML = `
                 <div class="bg-white rounded-2xl p-4 shadow-sm space-y-4">
@@ -1573,7 +1549,7 @@
             renderQuestionItem('generated-quiz-area', randQ);
         }
 
-        /* ----- MODULE 7: WRONG NOTES ----- */
+        /* MODULE 7: WRONG NOTES */
         function renderWrongNotesModule(container) {
             const wrongList = appState.wrongQuestions;
 
@@ -1636,7 +1612,7 @@
             renderWrongNotesModule(document.getElementById('view-module'));
         }
 
-        /* ----- MODULE 8: DICTIONARY ----- */
+        /* MODULE 8: DICTIONARY */
         function renderDictionaryModule(container, highlightId) {
             container.innerHTML = `
                 <div class="space-y-3">
@@ -1690,7 +1666,7 @@
             });
         }
 
-        /* ----- MODULE 9: ANALYTICS ----- */
+        /* MODULE 9: ANALYTICS */
         function renderAnalyticsModule(container) {
             const totalSolved = appState.solvedLogs.length;
             const correctCount = appState.solvedLogs.filter(l => l.isCorrect).length;
@@ -1717,9 +1693,9 @@
             `;
         }
 
-        /* ----- MODULE 10: MOCK EXAM ----- */
+        /* MODULE 10: MOCK EXAM */
         let mockTimer = null;
-        let mockTimeLeft = 600; // 10 mins
+        let mockTimeLeft = 600;
 
         function renderMockExamModule(container) {
             container.innerHTML = `
@@ -1777,7 +1753,7 @@
         }
 
         /* ==========================================================================
-           5. GENERIC QUESTION RENDERER & ANSWER EVALUATOR
+           5. QUESTION RENDERER & ANSWER EVALUATOR
            ========================================================================== */
 
         function renderQuestionItem(targetContainerId, q) {
