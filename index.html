@@ -1,0 +1,1977 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>신용분석사(1부·2부) 올인원 마스터 앱</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            bg: '#F9F8F3',
+                            card: '#FFFFFF',
+                            dark: '#1A362B',
+                            primary: '#2D6A4F',
+                            light: '#52B788',
+                            soft: '#D8F3DC',
+                            mint: '#E8F5E9',
+                            gold: '#D4AF37',
+                            goldSoft: '#FDF6E2',
+                            text: '#1E293B',
+                            muted: '#64748B',
+                            danger: '#E53E3E',
+                            accent: '#2563EB'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['-apple-system', 'BlinkMacSystemFont', 'Pretendard', 'Apple SD Gothic Neo', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome Icons CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            background-color: #F9F8F3;
+            color: #1E293B;
+            font-family: -apple-system, BlinkMacSystemFont, "Pretendard", sans-serif;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
+
+        /* Flashcard CSS Flip Style */
+        .card-container {
+            perspective: 1000px;
+        }
+        .card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            transform-style: preserve-3d;
+        }
+        .card-inner.flipped {
+            transform: rotateY(180deg);
+        }
+        .card-front, .card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            border-radius: 1.25rem;
+        }
+        .card-back {
+            transform: rotateY(180deg);
+        }
+
+        /* Hide Scrollbar for clean mobile UX */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        /* Custom Safe Area Padding for iOS Devices */
+        .pb-safe {
+            padding-bottom: env(safe-area-inset-bottom, 20px);
+        }
+
+        /* Elegant Fraction Box UI for Math Formulas */
+        .fraction-box {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            vertical-align: middle;
+            padding: 0 6px;
+        }
+        .fraction-numerator {
+            border-bottom: 2px solid currentColor;
+            padding-bottom: 2px;
+            width: 100%;
+            text-align: center;
+        }
+        .fraction-denominator {
+            padding-top: 2px;
+            width: 100%;
+            text-align: center;
+        }
+
+        /* Glassmorphic Shadow */
+        .glass-shadow {
+            box-shadow: 0 10px 25px -5px rgba(26, 54, 43, 0.05), 0 8px 10px -6px rgba(26, 54, 43, 0.03);
+        }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen bg-brand-bg text-brand-text max-w-md mx-auto relative border-x border-emerald-900/10 shadow-2xl">
+
+    <!-- TOP HEADER -->
+    <header class="sticky top-0 z-40 bg-brand-dark text-white px-4 py-3.5 shadow-lg flex items-center justify-between border-b border-emerald-800/30">
+        <div class="flex items-center space-x-2.5">
+            <button id="btn-back" onclick="navTo('dashboard')" class="hidden text-white/80 hover:text-white pr-1 text-lg">
+                <i class="fa-solid fa-chevron-left"></i>
+            </button>
+            <div class="w-8 h-8 rounded-lg bg-brand-gold/20 flex items-center justify-center border border-brand-gold/40">
+                <i class="fa-solid fa-award text-brand-gold text-base"></i>
+            </div>
+            <div>
+                <h1 id="header-title" class="font-extrabold text-base tracking-tight text-emerald-50">신용분석사 올인원</h1>
+            </div>
+        </div>
+        <div class="flex items-center space-x-3">
+            <button onclick="navTo('admin')" class="text-white/80 hover:text-brand-gold transition p-1" title="콘텐츠/문제 관리자">
+                <i class="fa-solid fa-sliders text-lg"></i>
+            </button>
+            <button onclick="toggleSearchModal()" class="text-white/80 hover:text-brand-gold transition p-1">
+                <i class="fa-solid fa-magnifying-glass text-lg"></i>
+            </button>
+            <button onclick="toggleCalcModal()" class="text-white/80 hover:text-brand-gold transition p-1">
+                <i class="fa-solid fa-calculator text-lg"></i>
+            </button>
+            <button onclick="toggleSettingsModal()" class="text-white/80 hover:text-brand-gold transition p-1">
+                <i class="fa-solid fa-gear text-lg"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- MAIN CONTAINER -->
+    <main id="main-content" class="flex-1 overflow-y-auto p-4 pb-24 no-scrollbar">
+
+        <!-- DASHBOARD VIEW -->
+        <section id="view-dashboard" class="space-y-5">
+            <!-- Premium Banner -->
+            <div class="bg-gradient-to-br from-brand-dark via-brand-primary to-emerald-950 text-white rounded-3xl p-5 shadow-xl relative overflow-hidden border border-emerald-700/30">
+                <div class="absolute -right-4 -bottom-4 w-32 h-32 bg-brand-gold/10 rounded-full blur-2xl pointer-events-none"></div>
+                <div class="relative z-10 flex justify-between items-start">
+                    <div>
+                        <span class="text-[11px] font-bold px-2.5 py-1 rounded-full bg-brand-gold/20 text-brand-gold border border-brand-gold/30 tracking-wide uppercase">DAILY MISSION</span>
+                        <h2 class="text-xl font-black mt-2 text-white tracking-tight">오늘도 합격을 향해!</h2>
+                        <p class="text-xs text-emerald-100/80 mt-1">목표 문제 20개 중 <span id="dash-today-count-badge" class="font-extrabold text-brand-gold text-sm">0</span>개 완료</p>
+                    </div>
+                    <button onclick="navTo('today')" class="bg-brand-gold hover:bg-yellow-500 text-brand-dark px-3.5 py-2 rounded-2xl text-xs font-black shadow-lg transition flex items-center space-x-1 border border-yellow-200">
+                        <span>오늘 학습</span>
+                        <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- KEY STATS WIDGET -->
+            <div class="bg-white rounded-3xl p-4.5 glass-shadow border border-emerald-900/5 space-y-3.5">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-black text-brand-dark flex items-center">
+                        <i class="fa-solid fa-chart-line text-brand-primary mr-1.5"></i>학습 현황 리포트
+                    </span>
+                    <span class="text-[10px] font-semibold text-brand-muted">실시간 자동 저장</span>
+                </div>
+                
+                <div class="grid grid-cols-3 gap-2.5 text-center">
+                    <div class="bg-brand-bg rounded-2xl p-3 border border-emerald-900/5">
+                        <span class="text-[11px] font-semibold text-brand-muted block">총 풀이</span>
+                        <span id="stat-total-solved" class="text-lg font-black text-brand-primary">0</span>
+                    </div>
+                    <div class="bg-brand-bg rounded-2xl p-3 border border-emerald-900/5">
+                        <span class="text-[11px] font-semibold text-brand-muted block">누적 정답률</span>
+                        <span id="stat-accuracy" class="text-lg font-black text-brand-dark">0%</span>
+                    </div>
+                    <div class="bg-brand-bg rounded-2xl p-3 border border-emerald-900/5">
+                        <span class="text-[11px] font-semibold text-brand-muted block">마스터 공식</span>
+                        <span id="stat-mastered-formulas" class="text-lg font-black text-emerald-600">0</span>
+                    </div>
+                </div>
+                
+                <!-- Subject Progress Bars -->
+                <div class="space-y-2.5 pt-2 border-t border-gray-100">
+                    <div>
+                        <div class="flex justify-between text-xs font-bold mb-1">
+                            <span class="text-gray-700"><i class="fa-solid fa-book-open text-brand-primary mr-1"></i>신용분석사 1부 (회계학)</span>
+                            <span id="part1-progress-percent" class="text-brand-primary">0%</span>
+                        </div>
+                        <div class="w-full bg-gray-100 rounded-full h-2 overflow-hidden">
+                            <div id="part1-progress-bar" class="bg-brand-primary h-2 rounded-full transition-all duration-500" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="flex justify-between text-xs font-bold mb-1">
+                            <span class="text-gray-700"><i class="fa-solid fa-scale-balanced text-brand-light mr-1"></i>신용분석사 2부 (신용평가)</span>
+                            <span id="part2-progress-percent" class="text-brand-light">0%</span>
+                        </div>
+                        <div class="w-full bg-gray-100 rounded-full h-2 overflow-hidden">
+                            <div id="part2-progress-bar" class="bg-brand-light h-2 rounded-full transition-all duration-500" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- QUICK ACCESS MENU CARDS (10 Modules) -->
+            <div>
+                <h3 class="text-xs font-black text-brand-muted mb-3 flex items-center px-1 uppercase tracking-wider">
+                    <i class="fa-solid fa-cubes text-brand-primary mr-1.5"></i>학습 모듈 선택
+                </h3>
+                <div class="grid grid-cols-2 gap-3">
+                    <div onclick="navTo('today')" class="bg-white p-4 rounded-3xl glass-shadow border border-emerald-900/5 hover:border-brand-light/40 transition cursor-pointer flex flex-col justify-between h-32 active:scale-95">
+                        <div class="flex items-center justify-between">
+                            <div class="w-10 h-10 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center font-bold text-lg shadow-sm">
+                                <i class="fa-solid fa-star"></i>
+                            </div>
+                            <span class="text-[10px] font-black text-amber-700 bg-amber-100/70 px-2 py-0.5 rounded-full">HOT</span>
+                        </div>
+                        <div>
+                            <h4 class="font-black text-sm text-brand-dark">1. 오늘의 학습</h4>
+                            <p class="text-[11px] font-medium text-brand-muted line-clamp-1 mt-0.5">취약점 맞춤 추천 문제</p>
+                        </div>
+                    </div>
+
+                    <div onclick="navTo('part1')" class="bg-white p-4 rounded-3xl glass-shadow border border-emerald-900/5 hover:border-brand-light/40 transition cursor-pointer flex flex-col justify-between h-32 active:scale-95">
+                        <div class="flex items-center justify-between">
+                            <div class="w-10 h-10 rounded-2xl bg-emerald-50 text-brand-primary flex items-center justify-center font-black text-sm shadow-sm">
+                                1부
+                            </div>
+                            <i class="fa-solid fa-chevron-right text-xs text-gray-300"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-black text-sm text-brand-dark">2. 신용분석사 1부</h4>
+                            <p class="text-[11px] font-medium text-brand-muted line-clamp-1 mt-0.5">회계학 및 재무제표</p>
+                        </div>
+                    </div>
+
+                    <div onclick="navTo('part2')" class="bg-white p-4 rounded-3xl glass-shadow border border-emerald-900/5 hover:border-brand-light/40 transition cursor-pointer flex flex-col justify-between h-32 active:scale-95">
+                        <div class="flex items-center justify-between">
+                            <div class="w-10 h-10 rounded-2xl bg-teal-50 text-teal-700 flex items-center justify-center font-black text-sm shadow-sm">
+                                2부
+                            </div>
+                            <i class="fa-solid fa-chevron-right text-xs text-gray-300"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-black text-sm text-brand-dark">3. 신용분석사 2부</h4>
+                            <p class="text-[11px] font-medium text-brand-muted line-clamp-1 mt-0.5">신용평가 & 현금흐름</p>
+                        </div>
+                    </div>
+
+                    <div onclick="navTo('flashcard')" class="bg-white p-4 rounded-3xl glass-shadow border border-emerald-900/5 hover:border-brand-light/40 transition cursor-pointer flex flex-col justify-between h-32 active:scale-95">
+                        <div class="flex items-center justify-between">
+                            <div class="w-10 h-10 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center font-bold text-lg shadow-sm">
+                                <i class="fa-solid fa-clone"></i>
+                            </div>
+                            <span class="text-[10px] font-black text-blue-700 bg-blue-100/70 px-2 py-0.5 rounded-full">공식암기</span>
+                        </div>
+                        <div>
+                            <h4 class="font-black text-sm text-brand-dark">4. 공식 플래시카드</h4>
+                            <p class="text-[11px] font-medium text-brand-muted line-clamp-1 mt-0.5">산식 완전정복 터치암기</p>
+                        </div>
+                    </div>
+
+                    <div onclick="navTo('calc_practice')" class="bg-white p-4 rounded-3xl glass-shadow border border-emerald-900/5 hover:border-brand-light/40 transition cursor-pointer flex flex-col justify-between h-32 active:scale-95">
+                        <div class="flex items-center justify-between">
+                            <div class="w-10 h-10 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold text-lg shadow-sm">
+                                <i class="fa-solid fa-square-root-variable"></i>
+                            </div>
+                            <i class="fa-solid fa-chevron-right text-xs text-gray-300"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-black text-sm text-brand-dark">5. 공식 계산 연습</h4>
+                            <p class="text-[11px] font-medium text-brand-muted line-clamp-1 mt-0.5">단계별 수치 계산 훈련</p>
+                        </div>
+                    </div>
+
+                    <div onclick="navTo('generator')" class="bg-white p-4 rounded-3xl glass-shadow border border-emerald-900/5 hover:border-brand-light/40 transition cursor-pointer flex flex-col justify-between h-32 active:scale-95">
+                        <div class="flex items-center justify-between">
+                            <div class="w-10 h-10 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center font-bold text-lg shadow-sm">
+                                <i class="fa-solid fa-wand-magic-sparkles"></i>
+                            </div>
+                            <i class="fa-solid fa-chevron-right text-xs text-gray-300"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-black text-sm text-brand-dark">6. 자동 생성 문제</h4>
+                            <p class="text-[11px] font-medium text-brand-muted line-clamp-1 mt-0.5">난이도별 맞춤 문제풀이</p>
+                        </div>
+                    </div>
+
+                    <div onclick="navTo('wrong_notes')" class="bg-white p-4 rounded-3xl glass-shadow border border-emerald-900/5 hover:border-brand-light/40 transition cursor-pointer flex flex-col justify-between h-32 active:scale-95">
+                        <div class="flex items-center justify-between">
+                            <div class="w-10 h-10 rounded-2xl bg-orange-50 text-orange-600 flex items-center justify-center font-bold text-lg shadow-sm">
+                                <i class="fa-solid fa-book-bookmark"></i>
+                            </div>
+                            <span id="wrong-count-badge" class="text-[10px] font-black text-white bg-brand-danger px-2 py-0.5 rounded-full">0</span>
+                        </div>
+                        <div>
+                            <h4 class="font-black text-sm text-brand-dark">7. 취약 오답노트</h4>
+                            <p class="text-[11px] font-medium text-brand-muted line-clamp-1 mt-0.5">반복 틀린 문제 재학습</p>
+                        </div>
+                    </div>
+
+                    <div onclick="navTo('dictionary')" class="bg-white p-4 rounded-3xl glass-shadow border border-emerald-900/5 hover:border-brand-light/40 transition cursor-pointer flex flex-col justify-between h-32 active:scale-95">
+                        <div class="flex items-center justify-between">
+                            <div class="w-10 h-10 rounded-2xl bg-emerald-50 text-emerald-700 flex items-center justify-center font-bold text-lg shadow-sm">
+                                <i class="fa-solid fa-spell-check"></i>
+                            </div>
+                            <i class="fa-solid fa-chevron-right text-xs text-gray-300"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-black text-sm text-brand-dark">8. 종합 공식 사전</h4>
+                            <p class="text-[11px] font-medium text-brand-muted line-clamp-1 mt-0.5">분자/분모 정밀 공식집</p>
+                        </div>
+                    </div>
+
+                    <div onclick="navTo('analytics')" class="bg-white p-4 rounded-3xl glass-shadow border border-emerald-900/5 hover:border-brand-light/40 transition cursor-pointer flex flex-col justify-between h-32 active:scale-95">
+                        <div class="flex items-center justify-between">
+                            <div class="w-10 h-10 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center font-bold text-lg shadow-sm">
+                                <i class="fa-solid fa-chart-pie"></i>
+                            </div>
+                            <i class="fa-solid fa-chevron-right text-xs text-gray-300"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-black text-sm text-brand-dark">9. 진도 및 통계</h4>
+                            <p class="text-[11px] font-medium text-brand-muted line-clamp-1 mt-0.5">정답률 데이터 다이어그램</p>
+                        </div>
+                    </div>
+
+                    <div onclick="navTo('mock_exam')" class="bg-white p-4 rounded-3xl glass-shadow border border-emerald-900/5 hover:border-brand-light/40 transition cursor-pointer flex flex-col justify-between h-32 active:scale-95">
+                        <div class="flex items-center justify-between">
+                            <div class="w-10 h-10 rounded-2xl bg-red-50 text-red-600 flex items-center justify-center font-bold text-lg shadow-sm">
+                                <i class="fa-solid fa-stopwatch"></i>
+                            </div>
+                            <span class="text-[10px] font-black text-red-700 bg-red-100/70 px-2 py-0.5 rounded-full">실전</span>
+                        </div>
+                        <div>
+                            <h4 class="font-black text-sm text-brand-dark">10. 실전 모의고사</h4>
+                            <p class="text-[11px] font-medium text-brand-muted line-clamp-1 mt-0.5">타이머 적용 실전 문제</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Custom Admin Banner -->
+            <div onclick="navTo('admin')" class="bg-gradient-to-r from-brand-dark to-brand-primary text-white p-4 rounded-3xl shadow-lg flex justify-between items-center cursor-pointer hover:opacity-95 transition border border-emerald-700/30">
+                <div class="flex items-center space-x-3.5">
+                    <div class="w-11 h-11 rounded-2xl bg-white/10 flex items-center justify-center text-brand-gold text-xl font-bold border border-white/10">
+                        <i class="fa-solid fa-pen-to-square"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-black text-sm text-emerald-50">문제/공식 수정 & 커스텀 관리자</h4>
+                        <p class="text-xs text-emerald-200/80 mt-0.5">나만의 문제 등록, JSON 백업/업데이트</p>
+                    </div>
+                </div>
+                <i class="fa-solid fa-chevron-right text-sm text-brand-gold"></i>
+            </div>
+        </section>
+
+        <!-- Dynamic Content Section Container -->
+        <section id="view-module" class="hidden space-y-4">
+        </section>
+
+    </main>
+
+    <!-- BOTTOM FIXED NAVBAR -->
+    <nav class="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-white/95 backdrop-blur-md border-t border-emerald-900/10 px-3 py-2 flex justify-around items-center z-30 pb-safe shadow-lg">
+        <button onclick="navTo('dashboard')" id="nav-item-dash" class="flex flex-col items-center p-1 text-brand-primary">
+            <i class="fa-solid fa-house text-lg"></i>
+            <span class="text-[10px] font-bold mt-1">홈</span>
+        </button>
+        <button onclick="navTo('flashcard')" id="nav-item-flashcard" class="flex flex-col items-center p-1 text-gray-400 hover:text-brand-primary">
+            <i class="fa-solid fa-clone text-lg"></i>
+            <span class="text-[10px] font-bold mt-1">플래시카드</span>
+        </button>
+        <button onclick="navTo('calc_practice')" id="nav-item-calc" class="flex flex-col items-center p-1 text-gray-400 hover:text-brand-primary">
+            <i class="fa-solid fa-calculator text-lg"></i>
+            <span class="text-[10px] font-bold mt-1">계산연습</span>
+        </button>
+        <button onclick="navTo('wrong_notes')" id="nav-item-wrong" class="flex flex-col items-center p-1 text-gray-400 hover:text-brand-primary relative">
+            <i class="fa-solid fa-book-bookmark text-lg"></i>
+            <span class="text-[10px] font-bold mt-1">오답노트</span>
+            <span id="nav-wrong-dot" class="hidden absolute top-1 right-2 w-2 h-2 rounded-full bg-brand-danger"></span>
+        </button>
+        <button onclick="navTo('dictionary')" id="nav-item-dict" class="flex flex-col items-center p-1 text-gray-400 hover:text-brand-primary">
+            <i class="fa-solid fa-spell-check text-lg"></i>
+            <span class="text-[10px] font-bold mt-1">공식집</span>
+        </button>
+    </nav>
+
+    <!-- SEARCH MODAL -->
+    <div id="modal-search" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-start justify-center pt-16 px-4 hidden">
+        <div class="bg-white w-full max-w-md rounded-3xl p-5 shadow-2xl space-y-3.5 border border-emerald-900/10">
+            <div class="flex justify-between items-center pb-2 border-b border-gray-100">
+                <h3 class="font-black text-base text-brand-dark"><i class="fa-solid fa-magnifying-glass text-brand-primary mr-1.5"></i> 공식 / 단원 검색</h3>
+                <button onclick="toggleSearchModal()" class="text-gray-400 hover:text-gray-600 text-xl font-bold">&times;</button>
+            </div>
+            <input type="text" id="search-input" onkeyup="handleGlobalSearch()" placeholder="예: ROE, 이자보상배율, 유동비율..." class="w-full bg-brand-bg border border-emerald-900/10 rounded-2xl px-4 py-2.5 text-sm font-bold text-brand-dark focus:outline-none focus:border-brand-primary">
+            <div id="search-results" class="max-h-60 overflow-y-auto space-y-2 text-sm no-scrollbar">
+                <p class="text-center text-xs text-brand-muted py-4 font-medium">검색어를 입력하세요.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- QUICK CALCULATOR MODAL -->
+    <div id="modal-calc" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-end justify-center hidden">
+        <div class="bg-white w-full max-w-md rounded-t-3xl p-5 shadow-2xl space-y-3 border-t border-emerald-900/10">
+            <div class="flex justify-between items-center border-b pb-2">
+                <span class="font-black text-sm text-brand-dark"><i class="fa-solid fa-calculator text-brand-primary mr-1.5"></i> 신용분석 전용 계산기</span>
+                <button onclick="toggleCalcModal()" class="text-gray-400 hover:text-gray-600 text-xl font-bold">&times;</button>
+            </div>
+            <!-- Calculator Display -->
+            <div class="bg-brand-bg rounded-2xl p-3.5 text-right border border-emerald-900/10">
+                <div id="calc-expression" class="text-xs text-brand-muted h-4 font-mono"></div>
+                <div id="calc-display" class="text-2xl font-black font-mono text-brand-dark tracking-wide">0</div>
+            </div>
+            <!-- Keypad -->
+            <div class="grid grid-cols-4 gap-2 text-sm font-bold">
+                <button onclick="calcKey('C')" class="p-3.5 bg-red-100 text-red-600 rounded-2xl hover:bg-red-200">C</button>
+                <button onclick="calcKey('(')" class="p-3.5 bg-gray-100 text-gray-700 rounded-2xl hover:bg-gray-200">(</button>
+                <button onclick="calcKey(')')" class="p-3.5 bg-gray-100 text-gray-700 rounded-2xl hover:bg-gray-200">)</button>
+                <button onclick="calcKey('/')" class="p-3.5 bg-brand-soft text-brand-dark rounded-2xl hover:bg-emerald-200">÷</button>
+
+                <button onclick="calcKey('7')" class="p-3.5 bg-gray-50 text-brand-dark rounded-2xl hover:bg-gray-100">7</button>
+                <button onclick="calcKey('8')" class="p-3.5 bg-gray-50 text-brand-dark rounded-2xl hover:bg-gray-100">8</button>
+                <button onclick="calcKey('9')" class="p-3.5 bg-gray-50 text-brand-dark rounded-2xl hover:bg-gray-100">9</button>
+                <button onclick="calcKey('*')" class="p-3.5 bg-brand-soft text-brand-dark rounded-2xl hover:bg-emerald-200">×</button>
+
+                <button onclick="calcKey('4')" class="p-3.5 bg-gray-50 text-brand-dark rounded-2xl hover:bg-gray-100">4</button>
+                <button onclick="calcKey('5')" class="p-3.5 bg-gray-50 text-brand-dark rounded-2xl hover:bg-gray-100">5</button>
+                <button onclick="calcKey('6')" class="p-3.5 bg-gray-50 text-brand-dark rounded-2xl hover:bg-gray-100">6</button>
+                <button onclick="calcKey('-')" class="p-3.5 bg-brand-soft text-brand-dark rounded-2xl hover:bg-emerald-200">-</button>
+
+                <button onclick="calcKey('1')" class="p-3.5 bg-gray-50 text-brand-dark rounded-2xl hover:bg-gray-100">1</button>
+                <button onclick="calcKey('2')" class="p-3.5 bg-gray-50 text-brand-dark rounded-2xl hover:bg-gray-100">2</button>
+                <button onclick="calcKey('3')" class="p-3.5 bg-gray-50 text-brand-dark rounded-2xl hover:bg-gray-100">3</button>
+                <button onclick="calcKey('+')" class="p-3.5 bg-brand-soft text-brand-dark rounded-2xl hover:bg-emerald-200">+</button>
+
+                <button onclick="calcKey('0')" class="p-3.5 bg-gray-50 text-brand-dark rounded-2xl hover:bg-gray-100">0</button>
+                <button onclick="calcKey('.')" class="p-3.5 bg-gray-50 text-brand-dark rounded-2xl hover:bg-gray-100">.</button>
+                <button onclick="calcKey('00')" class="p-3.5 bg-gray-50 text-brand-dark rounded-2xl hover:bg-gray-100">00</button>
+                <button onclick="calcKey('=')" class="p-3.5 bg-brand-primary text-white font-black rounded-2xl shadow-lg hover:bg-brand-dark">=</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SETTINGS MODAL -->
+    <div id="modal-settings" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white w-full max-w-sm rounded-3xl p-5 shadow-2xl space-y-4 border border-emerald-900/10">
+            <div class="flex justify-between items-center border-b pb-2">
+                <h3 class="font-black text-base text-brand-dark"><i class="fa-solid fa-gear text-brand-primary mr-1.5"></i> 학습 환경 및 동기화</h3>
+                <button onclick="toggleSettingsModal()" class="text-gray-400 hover:text-gray-600 text-xl font-bold">&times;</button>
+            </div>
+            <div class="space-y-3.5 text-sm">
+                <div>
+                    <label class="block text-xs font-bold text-brand-muted mb-1">일일 목표 문제 수</label>
+                    <input type="number" id="setting-daily-goal" min="5" max="100" class="w-full bg-brand-bg border border-emerald-900/10 rounded-2xl p-2.5 text-sm font-black text-brand-dark">
+                </div>
+                <div class="pt-2 border-t border-gray-100 space-y-2">
+                    <p class="text-xs font-black text-brand-dark">💡 다른 브라우저/기기로 문제 가져오기</p>
+                    <p class="text-[11px] text-brand-muted leading-tight">내 문제 및 학습 기록을 JSON 파일로 안전하게 저장하고 불러올 수 있습니다.</p>
+                    <div class="grid grid-cols-2 gap-2 pt-1">
+                        <button onclick="exportDataJSON()" class="bg-brand-soft text-brand-dark font-black py-2.5 rounded-2xl text-xs hover:bg-emerald-200 transition">
+                            <i class="fa-solid fa-download mr-1"></i> JSON 내보내기
+                        </button>
+                        <button onclick="document.getElementById('import-file-input').click()" class="bg-brand-soft text-brand-dark font-black py-2.5 rounded-2xl text-xs hover:bg-emerald-200 transition">
+                            <i class="fa-solid fa-upload mr-1"></i> JSON 불러오기
+                        </button>
+                    </div>
+                    <input type="file" id="import-file-input" class="hidden" accept=".json" onchange="importDataJSON(event)">
+                </div>
+                <div class="pt-2 border-t border-gray-100">
+                    <button onclick="resetAllData()" class="w-full bg-red-50 text-red-600 border border-red-200 py-2.5 rounded-2xl font-black text-xs hover:bg-red-100 transition">
+                        <i class="fa-solid fa-trash-can mr-1"></i> 모든 학습 데이터 초기화
+                    </button>
+                </div>
+            </div>
+            <button onclick="saveSettings()" class="w-full bg-brand-primary text-white font-black py-3 rounded-2xl text-sm shadow-lg hover:bg-brand-dark transition">
+                저장 및 닫기
+            </button>
+        </div>
+    </div>
+
+    <!-- TOAST NOTIFICATION -->
+    <div id="toast" class="fixed top-16 left-1/2 -translate-x-1/2 bg-brand-dark text-white px-4 py-2.5 rounded-2xl text-xs font-bold shadow-2xl transition-opacity duration-300 opacity-0 pointer-events-none z-50 flex items-center space-x-2 border border-emerald-700/50">
+        <i class="fa-solid fa-circle-check text-brand-gold"></i>
+        <span id="toast-msg">메시지 내용</span>
+    </div>
+
+    <!-- MAIN JAVASCRIPT LOGIC -->
+    <script>
+        /* ==========================================================================
+           1. SECURE DATA & OFFICIAL EXAM DATABASE
+           ========================================================================== */
+
+        const DEFAULT_FORMULA_DB = [
+            {
+                id: 'f_roe',
+                cat: '수익성',
+                name: 'ROE (자기자본이익률)',
+                formula: '당기순이익 ÷ 평균자기자본 × 100',
+                num: '당기순이익 (손익계산서)',
+                den: '평균자기자본 [(기초자기자본 + 기말자기자본)/2]',
+                meaning: '주주가 투자한 자본 대비 창출한 최종 순이익 비율',
+                highMeaning: '자기자본 효율성이 높고 주주가치 창출 능력이 우수함',
+                lowMeaning: '자기자본 대비 수익성이 낮아 경영 효율성 점검 필요',
+                note: '시험 기준: 평균잔액 사용 원칙.',
+                ex: '자기자본 200억원, 당기순이익 30억원 ➔ 15.0%'
+            },
+            {
+                id: 'f_roa',
+                cat: '수익성',
+                name: 'ROA (총자산순이익률)',
+                formula: '당기순이익 ÷ 평균총자산 × 100',
+                num: '당기순이익 (손익계산서)',
+                den: '평균총자산 [(기초총자산 + 기말총자산)/2]',
+                meaning: '기업이 보유한 총자산을 얼마나 효율적으로 운용하여 순이익을 얻었는지 측정',
+                highMeaning: '자산 운용 효율성이 우수함',
+                lowMeaning: '유휴 자산이 많거나 총자산 수익 창출 능력 약화',
+                note: '부채 및 자기자본 전체를 합한 자산 운용 능력 표시.',
+                ex: '총자산 1,000억원, 당기순이익 50억원 ➔ 5.0%'
+            },
+            {
+                id: 'f_debt_ratio',
+                cat: '안정성',
+                name: '부채비율',
+                formula: '타인자본(총부채) ÷ 자기자본 × 100',
+                num: '총부채 (유동부채 + 비유동부채)',
+                den: '자기자본 (자본금 + 이익잉여금 등)',
+                meaning: '기업의 타인자본 의존도를 측정하는 대표 재무건전성 지표',
+                highMeaning: '채권자에 대한 위험도가 높고 재무적 리스크 증가',
+                lowMeaning: '재무구조가 건전하지만 레버리지 효과 활용 부족 가능성',
+                note: '일반적으로 100% 이하를 이상적으로 보나 업종별 차이 존재.',
+                ex: '총부채 150억원, 자기자본 100억원 ➔ 150.0%'
+            },
+            {
+                id: 'f_icr',
+                cat: '안정성',
+                name: '이자보상배율 (ICR)',
+                formula: '영업이익 ÷ 이자비용',
+                num: '영업이익',
+                den: '이자비용 (손익계산서 금융비용 중 이자)',
+                meaning: '영업이익으로 금융비용(이자)을 충당할 수 있는 능력',
+                highMeaning: '이자 지급 능력이 충분함',
+                lowMeaning: '1미만인 경우 영업이익으로 이자조차 못 갚는 한계기업 위험',
+                note: '신용평가 시 한계기업 판정의 핵심 기준.',
+                ex: '영업이익 50억원, 이자비용 10억원 ➔ 5.0배'
+            },
+            {
+                id: 'f_ebitda',
+                cat: '현금흐름',
+                name: 'EBITDA',
+                formula: '영업이익 + 감가상각비 + 무형자산상각비',
+                num: '영업이익 + 유형자산감가상각비 + 무형자산상각비',
+                den: 'N/A',
+                meaning: '현금유출이 없는 상각비를 차감하기 전 실질 영업 현금창출능력',
+                highMeaning: '기업의 현금 영업 창출력 우수',
+                lowMeaning: '실질적인 현금유입 능력 저하',
+                note: '신용분석에서 회계적 이익의 착시를 제거하는 필수 지표.',
+                ex: '영업이익 80억원, 감가상각비 20억원 ➔ 100억원'
+            }
+        ];
+
+        const DEFAULT_QUESTION_BANK = [
+            {
+                id: 'q1',
+                part: 1,
+                subject: '기업회계기준',
+                chapter: '재무제표의 이해',
+                type: 'calc',
+                difficulty: '초급',
+                question: '주식회사 한국의 당기순이익이 40억원, 평균자기자본이 200억원일 때 자기자본이익률(ROE)은 얼마인가?',
+                options: ['15.0%', '20.0%', '25.0%', '30.0%'],
+                answer: '20.0%',
+                numericAnswer: 20,
+                explanation: 'ROE = (당기순이익 ÷ 평균자기자본) × 100 = (40 ÷ 200) × 100 = 20.0%',
+                formulaId: 'f_roe'
+            },
+            {
+                id: 'q2',
+                part: 1,
+                subject: '재무제표 분석',
+                chapter: '안정성 비율 분석',
+                type: 'mcq',
+                difficulty: '중급',
+                question: '다음 중 이자보상배율(ICR)에 관한 설명으로 가장 올바르지 않은 것은?',
+                options: [
+                    '영업이익을 이자비용으로 나누어 계산한다.',
+                    '이자보상배율이 1.0 미만이면 영업이익으로 이자비용을 감당하지 못함을 의미한다.',
+                    '감가상각비를 합산한 당기순이익을 분자로 사용하는 것이 표준 공식이다.',
+                    '3년 연속 1.0 미만인 기업은 한계기업으로 분류될 가능성이 높다.'
+                ],
+                answer: '감가상각비를 합산한 당기순이익을 분자로 사용하는 것이 표준 공식이다.',
+                explanation: '이자보상배율의 분자는 당기순이익이 아닌 영업이익(EBIT)입니다.',
+                formulaId: 'f_icr'
+            }
+        ];
+
+        let FORMULA_DB = [...DEFAULT_FORMULA_DB];
+        let QUESTION_BANK = [...DEFAULT_QUESTION_BANK];
+
+        /* ==========================================================================
+           2. APP STATE & SECURE STORAGE MANAGERS
+           ========================================================================== */
+
+        const STORAGE_KEY = 'CREDIT_ANALYST_APP_STATE_SECURE_V4';
+
+        let appState = {
+            todaySolvedCount: 0,
+            lastDateStr: new Date().toISOString().slice(0, 10),
+            dailyGoal: 20,
+            solvedLogs: [],
+            masteredFormulas: [],
+            wrongQuestions: [],
+            customFormulas: [],
+            customQuestions: []
+        };
+
+        function loadState() {
+            const raw = localStorage.getItem(STORAGE_KEY);
+            if (raw) {
+                try {
+                    const parsed = JSON.parse(raw);
+                    if (parsed && typeof parsed === 'object') {
+                        appState.todaySolvedCount = typeof parsed.todaySolvedCount === 'number' ? parsed.todaySolvedCount : 0;
+                        appState.dailyGoal = typeof parsed.dailyGoal === 'number' ? parsed.dailyGoal : 20;
+                        appState.lastDateStr = typeof parsed.lastDateStr === 'string' ? parsed.lastDateStr : new Date().toISOString().slice(0, 10);
+                        appState.solvedLogs = Array.isArray(parsed.solvedLogs) ? parsed.solvedLogs : [];
+                        appState.masteredFormulas = Array.isArray(parsed.masteredFormulas) ? parsed.masteredFormulas : [];
+                        appState.wrongQuestions = Array.isArray(parsed.wrongQuestions) ? parsed.wrongQuestions : [];
+                        appState.customFormulas = Array.isArray(parsed.customFormulas) ? parsed.customFormulas : [];
+                        appState.customQuestions = Array.isArray(parsed.customQuestions) ? parsed.customQuestions : [];
+                    }
+                    
+                    const today = new Date().toISOString().slice(0, 10);
+                    if (appState.lastDateStr !== today) {
+                        appState.todaySolvedCount = 0;
+                        appState.lastDateStr = today;
+                    }
+                } catch (e) {
+                    console.error("Secure State parse error", e);
+                }
+            }
+            
+            FORMULA_DB = [...DEFAULT_FORMULA_DB, ...(appState.customFormulas || [])];
+            QUESTION_BANK = [...DEFAULT_QUESTION_BANK, ...(appState.customQuestions || [])];
+        }
+
+        function saveState() {
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
+                updateDashboardStats();
+            } catch (e) {
+                showToast('저장 공간 부족 또는 오류 발생');
+            }
+        }
+
+        /* STRICT & SECURE JSON IMPORT VALIDATION */
+        function exportDataJSON() {
+            const exportObj = {
+                version: '4.0',
+                appState: appState,
+                exportDate: new Date().toISOString()
+            };
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportObj, null, 2));
+            const dlAnchorElem = document.createElement('a');
+            dlAnchorElem.setAttribute("href", dataStr);
+            dlAnchorElem.setAttribute("download", `CreditAnalyst_Data_${new Date().toISOString().slice(0,10)}.json`);
+            dlAnchorElem.click();
+            showToast('데이터가 안전하게 내보내기 되었습니다.');
+        }
+
+        function importDataJSON(event) {
+            const fileReader = new FileReader();
+            fileReader.onload = function(e) {
+                try {
+                    const imported = JSON.parse(e.target.result);
+                    // Strict schema verification to prevent prototype pollution or invalid data injection
+                    if (!imported || typeof imported !== 'object' || !imported.appState) {
+                        throw new Error('Invalid schema');
+                    }
+                    const impState = imported.appState;
+                    if (!Array.isArray(impState.solvedLogs) || !Array.isArray(impState.customQuestions)) {
+                        throw new Error('Invalid types inside appState');
+                    }
+
+                    // Assign validated data
+                    appState = {
+                        todaySolvedCount: typeof impState.todaySolvedCount === 'number' ? impState.todaySolvedCount : 0,
+                        lastDateStr: typeof impState.lastDateStr === 'string' ? impState.lastDateStr : new Date().toISOString().slice(0, 10),
+                        dailyGoal: typeof impState.dailyGoal === 'number' ? impState.dailyGoal : 20,
+                        solvedLogs: impState.solvedLogs,
+                        masteredFormulas: Array.isArray(impState.masteredFormulas) ? impState.masteredFormulas : [],
+                        wrongQuestions: Array.isArray(impState.wrongQuestions) ? impState.wrongQuestions : [],
+                        customFormulas: Array.isArray(impState.customFormulas) ? impState.customFormulas : [],
+                        customQuestions: Array.isArray(impState.customQuestions) ? impState.customQuestions : []
+                    };
+
+                    saveState();
+                    loadState();
+                    showToast('데이터 가져오기 성공!');
+                    navTo('dashboard');
+                } catch (err) {
+                    showToast('유효하지 않거나 손상된 JSON 파일입니다.');
+                }
+            };
+            if(event.target.files && event.target.files[0]) {
+                fileReader.readAsText(event.target.files[0]);
+            }
+        }
+
+        /* ==========================================================================
+           3. NAVIGATION & SECURE DOM RENDERER (XSS PREVENTION)
+           ========================================================================== */
+
+        let currentView = 'dashboard';
+
+        function navTo(viewName, params = {}) {
+            currentView = viewName;
+            const mainDash = document.getElementById('view-dashboard');
+            const mainMod = document.getElementById('view-module');
+            const btnBack = document.getElementById('btn-back');
+            const titleEl = document.getElementById('header-title');
+
+            document.querySelectorAll('nav button').forEach(btn => {
+                btn.classList.remove('text-brand-primary');
+                btn.classList.add('text-gray-400');
+            });
+
+            if (viewName === 'dashboard') {
+                mainDash.classList.remove('hidden');
+                mainMod.classList.add('hidden');
+                btnBack.classList.add('hidden');
+                titleEl.textContent = '신용분석사 올인원';
+                document.getElementById('nav-item-dash').classList.add('text-brand-primary');
+                document.getElementById('nav-item-dash').classList.remove('text-gray-400');
+                updateDashboardStats();
+            } else {
+                mainDash.classList.add('hidden');
+                mainMod.classList.remove('hidden');
+                btnBack.classList.remove('hidden');
+                
+                if (viewName === 'flashcard') document.getElementById('nav-item-flashcard').classList.add('text-brand-primary');
+                else if (viewName === 'calc_practice') document.getElementById('nav-item-calc').classList.add('text-brand-primary');
+                else if (viewName === 'wrong_notes') document.getElementById('nav-item-wrong').classList.add('text-brand-primary');
+                else if (viewName === 'dictionary') document.getElementById('nav-item-dict').classList.add('text-brand-primary');
+
+                renderModuleView(viewName, params);
+            }
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function updateDashboardStats() {
+            const totalSolved = appState.solvedLogs.length;
+            const correctCount = appState.solvedLogs.filter(l => l.isCorrect).length;
+            const accuracy = totalSolved > 0 ? Math.round((correctCount / totalSolved) * 100) : 0;
+
+            document.getElementById('stat-total-solved').textContent = totalSolved;
+            document.getElementById('stat-accuracy').textContent = accuracy + '%';
+            document.getElementById('stat-mastered-formulas').textContent = appState.masteredFormulas.length;
+            document.getElementById('dash-today-count-badge').textContent = appState.todaySolvedCount;
+            document.getElementById('wrong-count-badge').textContent = appState.wrongQuestions.length;
+
+            if (appState.wrongQuestions.length > 0) {
+                document.getElementById('nav-wrong-dot').classList.remove('hidden');
+            } else {
+                document.getElementById('nav-wrong-dot').classList.add('hidden');
+            }
+
+            const p1Total = QUESTION_BANK.filter(q => q.part === 1).length;
+            const p1Solved = new Set(appState.solvedLogs.filter(l => {
+                const q = QUESTION_BANK.find(item => item.id === l.questionId);
+                return q && q.part === 1 && l.isCorrect;
+            }).map(l => l.questionId)).size;
+            const p1Pct = p1Total > 0 ? Math.round((p1Solved / p1Total) * 100) : 0;
+
+            const p2Total = QUESTION_BANK.filter(q => q.part === 2).length;
+            const p2Solved = new Set(appState.solvedLogs.filter(l => {
+                const q = QUESTION_BANK.find(item => item.id === l.questionId);
+                return q && q.part === 2 && l.isCorrect;
+            }).map(l => l.questionId)).size;
+            const p2Pct = p2Total > 0 ? Math.round((p2Solved / p2Total) * 100) : 0;
+
+            document.getElementById('part1-progress-percent').textContent = p1Pct + '%';
+            document.getElementById('part1-progress-bar').style.width = p1Pct + '%';
+            document.getElementById('part2-progress-percent').textContent = p2Pct + '%';
+            document.getElementById('part2-progress-bar').style.width = p2Pct + '%';
+        }
+
+        function renderFractionHTML(num, den) {
+            if (!den || den === 'N/A' || den.trim() === '') {
+                return `<span class="font-extrabold text-brand-gold">${escapeHTML(num)}</span>`;
+            }
+            return `
+                <div class="fraction-box font-extrabold inline-block align-middle my-1">
+                    <div class="fraction-numerator text-brand-gold border-brand-gold">${escapeHTML(num)}</div>
+                    <div class="fraction-denominator text-emerald-100">${escapeHTML(den)}</div>
+                </div>
+            `;
+        }
+
+        function escapeHTML(str) {
+            if (typeof str !== 'string') return str;
+            return str.replace(/[&<>'"]/g, 
+                tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
+            );
+        }
+
+        /* ==========================================================================
+           4. MODULE RENDERING & DOM SANITIZATION
+           ========================================================================== */
+
+        function renderModuleView(viewName, params) {
+            const container = document.getElementById('view-module');
+            const titleEl = document.getElementById('header-title');
+
+            if (viewName === 'today') {
+                titleEl.textContent = '1. 오늘의 추천 학습';
+                renderTodayModule(container);
+            } else if (viewName === 'part1') {
+                titleEl.textContent = '2. 신용분석사 1부';
+                renderPartSubjectModule(container, 1);
+            } else if (viewName === 'part2') {
+                titleEl.textContent = '3. 신용분석사 2부';
+                renderPartSubjectModule(container, 2);
+            } else if (viewName === 'flashcard') {
+                titleEl.textContent = '4. 공식 암기 플래시카드';
+                renderFlashcardModule(container);
+            } else if (viewName === 'calc_practice') {
+                titleEl.textContent = '5. 공식 계산 연습';
+                renderCalcPracticeModule(container);
+            } else if (viewName === 'generator') {
+                titleEl.textContent = '6. 자동 생성 문제풀이';
+                renderGeneratorModule(container);
+            } else if (viewName === 'wrong_notes') {
+                titleEl.textContent = '7. 취약 오답 노트';
+                renderWrongNotesModule(container);
+            } else if (viewName === 'dictionary') {
+                titleEl.textContent = '8. 종합 신용평가 공식집';
+                renderDictionaryModule(container, params.formulaId);
+            } else if (viewName === 'analytics') {
+                titleEl.textContent = '9. 학습 진도 및 정답률';
+                renderAnalyticsModule(container);
+            } else if (viewName === 'mock_exam') {
+                titleEl.textContent = '10. 실전 모의고사';
+                renderMockExamModule(container);
+            } else if (viewName === 'admin') {
+                titleEl.textContent = '11. 문제/공식 관리자 (CRUD)';
+                renderAdminModule(container);
+            }
+        }
+
+        /* MODULE 1 */
+        function renderTodayModule(container) {
+            container.innerHTML = `
+                <div class="space-y-4">
+                    <div class="bg-white rounded-3xl p-4.5 glass-shadow border border-amber-100 space-y-1">
+                        <span class="text-[10px] font-black text-amber-700 bg-amber-100 px-2 py-0.5 rounded-full uppercase">맞춤 복습</span>
+                        <h3 class="font-black text-base text-brand-dark">오늘의 추천 핵심 문제</h3>
+                        <p class="text-xs text-brand-muted">출제 빈도가 가장 높은 재무비율 및 신용평가 문제 모음입니다.</p>
+                    </div>
+                    <div id="today-quiz-list" class="space-y-4"></div>
+                </div>
+            `;
+            const quizList = document.getElementById('today-quiz-list');
+            QUESTION_BANK.slice(0, 3).forEach(q => {
+                const wrapper = document.createElement('div');
+                wrapper.id = `today-q-${q.id}`;
+                quizList.appendChild(wrapper);
+                renderQuestionItem(`today-q-${q.id}`, q);
+            });
+        }
+
+        /* MODULE 2 & 3 */
+        function renderPartSubjectModule(container, partNum) {
+            const filteredQuestions = QUESTION_BANK.filter(q => q.part === partNum);
+            container.innerHTML = `
+                <div class="space-y-4">
+                    <div class="bg-white rounded-3xl p-4.5 glass-shadow border border-emerald-900/10 flex justify-between items-center">
+                        <div>
+                            <h3 class="font-black text-base text-brand-dark">신용분석사 ${partNum}부 실전 문제</h3>
+                            <p class="text-xs text-brand-muted">총 ${filteredQuestions.length}개의 엄선된 출제 문제</p>
+                        </div>
+                        <span class="text-sm font-black text-brand-primary bg-brand-soft px-3.5 py-1.5 rounded-2xl">${partNum}부</span>
+                    </div>
+                    <div id="part-quiz-list" class="space-y-4"></div>
+                </div>
+            `;
+            const quizList = document.getElementById('part-quiz-list');
+            filteredQuestions.forEach(q => {
+                const wrapper = document.createElement('div');
+                wrapper.id = `part-q-${q.id}`;
+                quizList.appendChild(wrapper);
+                renderQuestionItem(`part-q-${q.id}`, q);
+            });
+        }
+
+        /* MODULE 4: FLASHCARDS */
+        let fcIndex = 0;
+
+        function renderFlashcardModule(container) {
+            if (!FORMULA_DB || FORMULA_DB.length === 0) {
+                container.innerHTML = '<p class="text-center text-xs py-8 text-brand-muted">등록된 공식이 없습니다.</p>';
+                return;
+            }
+
+            const currentFormula = FORMULA_DB[fcIndex % FORMULA_DB.length];
+
+            container.innerHTML = `
+                <div class="space-y-4">
+                    <div class="flex justify-between items-center bg-white px-4 py-3 rounded-2xl glass-shadow border border-emerald-900/5">
+                        <span class="text-xs font-bold text-brand-dark">분류: <span class="text-brand-primary">${escapeHTML(currentFormula.cat)}</span></span>
+                        <span class="text-xs font-black text-brand-gold bg-brand-dark px-2.5 py-0.5 rounded-full">${fcIndex + 1} / ${FORMULA_DB.length}</span>
+                    </div>
+
+                    <div class="card-container w-full h-80 cursor-pointer" onclick="toggleCardFlip()">
+                        <div id="flashcard-inner-box" class="card-inner">
+                            
+                            <!-- Front Side -->
+                            <div class="card-front bg-white border-2 border-brand-primary/20 p-6 flex flex-col justify-between shadow-xl">
+                                <div class="flex justify-between items-center">
+                                    <span class="text-xs font-bold px-2.5 py-1 bg-brand-soft text-brand-dark rounded-lg">${escapeHTML(currentFormula.cat)}</span>
+                                    <span class="text-xs font-bold text-brand-muted"><i class="fa-solid fa-rotate text-brand-primary mr-1"></i>터치하여 수식 정답 확인</span>
+                                </div>
+                                <div class="text-center my-auto space-y-2">
+                                    <h3 class="text-2xl font-black text-brand-dark tracking-tight">${escapeHTML(currentFormula.name)}</h3>
+                                    <p class="text-xs font-medium text-brand-muted">이 지표의 정확한 산식(분자/분모)과 의미는?</p>
+                                </div>
+                                <div class="text-center">
+                                    <span class="text-xs font-bold text-brand-primary border border-brand-primary/30 px-4 py-2 rounded-2xl bg-brand-soft/50">카드 뒤집기</span>
+                                </div>
+                            </div>
+
+                            <!-- Back Side -->
+                            <div class="card-back bg-gradient-to-br from-brand-dark to-emerald-950 text-white p-6 flex flex-col justify-between shadow-2xl overflow-y-auto no-scrollbar border border-emerald-700/30">
+                                <div class="flex justify-between items-center border-b border-emerald-800/60 pb-2">
+                                    <span class="text-xs font-black text-brand-gold">${escapeHTML(currentFormula.name)}</span>
+                                    <span class="text-[11px] text-emerald-200">정확한 공식 및 해설</span>
+                                </div>
+                                <div class="my-auto space-y-3 text-left py-2">
+                                    <div class="bg-black/30 p-3 rounded-2xl text-center border border-white/10">
+                                        <span class="text-[10px] text-emerald-300 font-bold block uppercase mb-1">시각적 분수 공식</span>
+                                        <div class="text-white">
+                                            ${renderFractionHTML(currentFormula.num, currentFormula.den)}
+                                        </div>
+                                    </div>
+                                    <div class="text-xs bg-white/5 p-3 rounded-xl border border-white/5 space-y-1">
+                                        <p><span class="text-brand-gold font-bold">의미:</span> ${escapeHTML(currentFormula.meaning)}</p>
+                                        <p class="text-emerald-200/80 text-[11px]"><strong>주의사항:</strong> ${escapeHTML(currentFormula.note)}</p>
+                                    </div>
+                                </div>
+                                <div class="text-center pt-2">
+                                    <span class="text-[11px] text-emerald-300 font-semibold">카드를 다시 터치하면 앞면으로 이동합니다</span>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <button id="fc-btn-unknown" class="bg-white text-red-600 border border-red-200 p-3.5 rounded-2xl font-black text-xs shadow-sm hover:bg-red-50 transition flex items-center justify-center space-x-1.5 active:scale-95">
+                            <i class="fa-solid fa-xmark text-sm"></i>
+                            <span>아직 모름 (복습)</span>
+                        </button>
+                        <button id="fc-btn-known" class="bg-brand-primary text-white p-3.5 rounded-2xl font-black text-xs shadow-md hover:bg-brand-dark transition flex items-center justify-center space-x-1.5 active:scale-95 border border-emerald-700/30">
+                            <i class="fa-solid fa-check text-sm text-brand-gold"></i>
+                            <span>알고 있음 (완료)</span>
+                        </button>
+                    </div>
+
+                    <div class="flex justify-between items-center pt-1">
+                        <button id="fc-btn-prev" class="text-xs font-bold text-brand-dark bg-white px-4 py-2.5 rounded-2xl border border-emerald-900/10 shadow-sm">
+                            <i class="fa-solid fa-chevron-left mr-1"></i> 이전 공식
+                        </button>
+                        <button id="fc-btn-next" class="text-xs font-bold text-brand-dark bg-white px-4 py-2.5 rounded-2xl border border-emerald-900/10 shadow-sm">
+                            다음 공식 <i class="fa-solid fa-chevron-right ml-1"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('fc-btn-unknown').addEventListener('click', () => markFormulaStatus(currentFormula.id, false));
+            document.getElementById('fc-btn-known').addEventListener('click', () => markFormulaStatus(currentFormula.id, true));
+            document.getElementById('fc-btn-prev').addEventListener('click', prevFlashcard);
+            document.getElementById('fc-btn-next').addEventListener('click', nextFlashcard);
+        }
+
+        function toggleCardFlip() {
+            const inner = document.getElementById('flashcard-inner-box');
+            if (inner) inner.classList.toggle('flipped');
+        }
+
+        function prevFlashcard() {
+            fcIndex = (fcIndex - 1 + FORMULA_DB.length) % FORMULA_DB.length;
+            renderFlashcardModule(document.getElementById('view-module'));
+        }
+
+        function nextFlashcard() {
+            fcIndex = (fcIndex + 1) % FORMULA_DB.length;
+            renderFlashcardModule(document.getElementById('view-module'));
+        }
+
+        function markFormulaStatus(fId, isKnown) {
+            if (isKnown) {
+                if (!appState.masteredFormulas.includes(fId)) appState.masteredFormulas.push(fId);
+                showToast('암기 완료 항목에 등록되었습니다!');
+            } else {
+                appState.masteredFormulas = appState.masteredFormulas.filter(id => id !== fId);
+                showToast('복습 필요 항목으로 유지됩니다.');
+            }
+            saveState();
+            nextFlashcard();
+        }
+
+        /* MODULE 11: ADMIN CRUD (SECURE DOM APPENDS) */
+        function renderAdminModule(container) {
+            container.innerHTML = `
+                <div class="space-y-4">
+                    <div class="flex border-b border-gray-200 bg-white rounded-2xl p-1.5 shadow-sm border border-emerald-900/5">
+                        <button onclick="switchAdminTab('q')" id="admin-tab-q" class="flex-1 py-2 text-xs font-black text-center rounded-xl bg-brand-primary text-white">
+                            문제 관리 (${QUESTION_BANK.length})
+                        </button>
+                        <button onclick="switchAdminTab('f')" id="admin-tab-f" class="flex-1 py-2 text-xs font-black text-center rounded-xl text-brand-muted">
+                            공식 사전 관리 (${FORMULA_DB.length})
+                        </button>
+                    </div>
+
+                    <div id="admin-sec-q" class="space-y-3">
+                        <button onclick="toggleAddQuestionForm()" class="w-full bg-brand-primary text-white font-black py-3 rounded-2xl text-xs shadow-md flex items-center justify-center space-x-1 border border-emerald-700/30">
+                            <i class="fa-solid fa-plus text-brand-gold"></i>
+                            <span>새 신용분석사 문제 직접 추가</span>
+                        </button>
+                        
+                        <div id="form-add-q" class="hidden bg-white rounded-3xl p-5 shadow-xl border border-brand-primary/20 space-y-3.5 text-xs">
+                            <h4 class="font-black text-sm text-brand-dark border-b pb-2">새 문제 등록</h4>
+                            <div class="grid grid-cols-2 gap-2">
+                                <div>
+                                    <label class="block font-bold text-gray-600 mb-1">시험 파트</label>
+                                    <select id="new-q-part" class="w-full border p-2.5 rounded-xl bg-gray-50 font-bold text-brand-dark">
+                                        <option value="1">1부</option>
+                                        <option value="2">2부</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block font-bold text-gray-600 mb-1">난이도</label>
+                                    <select id="new-q-diff" class="w-full border p-2.5 rounded-xl bg-gray-50 font-bold text-brand-dark">
+                                        <option value="초급">초급</option>
+                                        <option value="중급">중급</option>
+                                        <option value="고급">고급</option>
+                                        <option value="실전">실전</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block font-bold text-gray-600 mb-1">과목명 / 단원</label>
+                                <input type="text" id="new-q-sub" placeholder="예: 재무제표 분석" class="w-full border p-2.5 rounded-xl">
+                            </div>
+                            <div>
+                                <label class="block font-bold text-gray-600 mb-1">문제 지문</label>
+                                <textarea id="new-q-text" rows="2" placeholder="문제 내용" class="w-full border p-2.5 rounded-xl"></textarea>
+                            </div>
+                            <div>
+                                <label class="block font-bold text-gray-600 mb-1">보기 (쉼표로 구분)</label>
+                                <input type="text" id="new-q-opts" placeholder="10%, 15%, 20%, 25%" class="w-full border p-2.5 rounded-xl">
+                            </div>
+                            <div>
+                                <label class="block font-bold text-gray-600 mb-1">정답</label>
+                                <input type="text" id="new-q-ans" placeholder="예: 15%" class="w-full border p-2.5 rounded-xl font-bold text-brand-primary">
+                            </div>
+                            <div>
+                                <label class="block font-bold text-gray-600 mb-1">해설 및 풀이과정</label>
+                                <textarea id="new-q-exp" rows="2" placeholder="상세 풀이" class="w-full border p-2.5 rounded-xl"></textarea>
+                            </div>
+                            <button onclick="saveNewQuestion()" class="w-full bg-brand-primary text-white font-black py-3 rounded-2xl shadow-lg">
+                                문제 등록 완료
+                            </button>
+                        </div>
+
+                        <div id="admin-q-list" class="space-y-2"></div>
+                    </div>
+
+                    <div id="admin-sec-f" class="hidden space-y-3">
+                        <button onclick="toggleAddFormulaForm()" class="w-full bg-brand-primary text-white font-black py-3 rounded-2xl text-xs shadow-md flex items-center justify-center space-x-1 border border-emerald-700/30">
+                            <i class="fa-solid fa-plus text-brand-gold"></i>
+                            <span>새 공식 지표 직접 추가</span>
+                        </button>
+
+                        <div id="form-add-f" class="hidden bg-white rounded-3xl p-5 shadow-xl border border-brand-primary/20 space-y-3.5 text-xs">
+                            <h4 class="font-black text-sm text-brand-dark border-b pb-2">새 공식 등록</h4>
+                            <div>
+                                <label class="block font-bold text-gray-600 mb-1">카테고리</label>
+                                <input type="text" id="new-f-cat" placeholder="예: 수익성" class="w-full border p-2.5 rounded-xl">
+                            </div>
+                            <div>
+                                <label class="block font-bold text-gray-600 mb-1">공식 명칭</label>
+                                <input type="text" id="new-f-name" placeholder="예: 추가지표" class="w-full border p-2.5 rounded-xl">
+                            </div>
+                            <div class="grid grid-cols-2 gap-2">
+                                <div>
+                                    <label class="block font-bold text-gray-600 mb-1">분자</label>
+                                    <input type="text" id="new-f-num" placeholder="분자" class="w-full border p-2.5 rounded-xl">
+                                </div>
+                                <div>
+                                    <label class="block font-bold text-gray-600 mb-1">분모</label>
+                                    <input type="text" id="new-f-den" placeholder="분모" class="w-full border p-2.5 rounded-xl">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block font-bold text-gray-600 mb-1">산식 텍스트</label>
+                                <input type="text" id="new-f-text" placeholder="분자 ÷ 분모" class="w-full border p-2.5 rounded-xl font-bold">
+                            </div>
+                            <div>
+                                <label class="block font-bold text-gray-600 mb-1">설명</label>
+                                <textarea id="new-f-meaning" rows="2" placeholder="의미 설명" class="w-full border p-2.5 rounded-xl"></textarea>
+                            </div>
+                            <button onclick="saveNewFormula()" class="w-full bg-brand-primary text-white font-black py-3 rounded-2xl shadow-lg">
+                                공식 등록 완료
+                            </button>
+                        </div>
+
+                        <div id="admin-f-list" class="space-y-2"></div>
+                    </div>
+                </div>
+            `;
+            renderAdminQList();
+            renderAdminFList();
+        }
+
+        function switchAdminTab(tab) {
+            if (tab === 'q') {
+                document.getElementById('admin-sec-q').classList.remove('hidden');
+                document.getElementById('admin-sec-f').classList.add('hidden');
+                document.getElementById('admin-tab-q').className = "flex-1 py-2 text-xs font-black text-center rounded-xl bg-brand-primary text-white";
+                document.getElementById('admin-tab-f').className = "flex-1 py-2 text-xs font-black text-center rounded-xl text-brand-muted";
+            } else {
+                document.getElementById('admin-sec-q').classList.add('hidden');
+                document.getElementById('admin-sec-f').classList.remove('hidden');
+                document.getElementById('admin-tab-f').className = "flex-1 py-2 text-xs font-black text-center rounded-xl bg-brand-primary text-white";
+                document.getElementById('admin-tab-q').className = "flex-1 py-2 text-xs font-black text-center rounded-xl text-brand-muted";
+            }
+        }
+
+        function toggleAddQuestionForm() {
+            document.getElementById('form-add-q').classList.toggle('hidden');
+        }
+
+        function toggleAddFormulaForm() {
+            document.getElementById('form-add-f').classList.toggle('hidden');
+        }
+
+        function saveNewQuestion() {
+            const part = parseInt(document.getElementById('new-q-part').value);
+            const diff = document.getElementById('new-q-diff').value;
+            const sub = document.getElementById('new-q-sub.value')?.trim() || '사용자 과목';
+            const text = document.getElementById('new-q-text').value.trim();
+            const optsRaw = document.getElementById('new-q-opts').value.trim();
+            const ans = document.getElementById('new-q-ans').value.trim();
+            const exp = document.getElementById('new-q-exp').value.trim();
+
+            if (!text || !ans) {
+                showToast('문제 지문과 정답을 입력해주세요.');
+                return;
+            }
+
+            const opts = optsRaw ? optsRaw.split(',').map(s => s.trim()) : [ans];
+
+            const newQ = {
+                id: 'custom_q_' + Date.now(),
+                part: part,
+                subject: sub,
+                chapter: '사용자 추가',
+                type: 'calc',
+                difficulty: diff,
+                question: text,
+                options: opts,
+                answer: ans,
+                explanation: exp
+            };
+
+            appState.customQuestions = appState.customQuestions || [];
+            appState.customQuestions.push(newQ);
+            saveState();
+            loadState();
+            showToast('새 문제가 등록되었습니다!');
+            renderAdminModule(document.getElementById('view-module'));
+        }
+
+        function saveNewFormula() {
+            const cat = document.getElementById('new-f-cat').value.trim() || '기타';
+            const name = document.getElementById('new-f-name').value.trim();
+            const num = document.getElementById('new-f-num').value.trim();
+            const den = document.getElementById('new-f-den').value.trim();
+            const text = document.getElementById('new-f-text').value.trim() || `${num} ÷ ${den}`;
+            const meaning = document.getElementById('new-f-meaning').value.trim() || '';
+
+            if (!name) {
+                showToast('공식 명칭을 입력해주세요.');
+                return;
+            }
+
+            const newF = {
+                id: 'custom_f_' + Date.now(),
+                cat: cat,
+                name: name,
+                formula: text,
+                num: num,
+                den: den,
+                meaning: meaning,
+                highMeaning: '지표 양호',
+                lowMeaning: '지표 유의',
+                note: '사용자 등록 공식',
+                ex: '예제 미등록'
+            };
+
+            appState.customFormulas = appState.customFormulas || [];
+            appState.customFormulas.push(newF);
+            saveState();
+            loadState();
+            showToast('새 공식이 성공적으로 등록되었습니다!');
+            renderAdminModule(document.getElementById('view-module'));
+        }
+
+        function deleteQuestion(qId) {
+            if (confirm('이 문제를 삭제하시겠습니까?')) {
+                appState.customQuestions = (appState.customQuestions || []).filter(q => q.id !== qId);
+                saveState();
+                loadState();
+                showToast('문제 삭제 완료');
+                renderAdminModule(document.getElementById('view-module'));
+            }
+        }
+
+        function deleteFormula(fId) {
+            if (confirm('이 공식을 삭제하시겠습니까?')) {
+                appState.customFormulas = (appState.customFormulas || []).filter(f => f.id !== fId);
+                saveState();
+                loadState();
+                showToast('공식 삭제 완료');
+                renderAdminModule(document.getElementById('view-module'));
+            }
+        }
+
+        function renderAdminQList() {
+            const container = document.getElementById('admin-q-list');
+            if (!container) return;
+
+            container.innerHTML = '';
+            QUESTION_BANK.forEach(q => {
+                const isCustom = q.id.startsWith('custom_q_');
+                const item = document.createElement('div');
+                item.className = 'bg-white p-3 rounded-2xl border border-gray-100 flex justify-between items-center text-xs shadow-sm';
+                
+                const infoDiv = document.createElement('div');
+                infoDiv.className = 'space-y-0.5 flex-1 pr-2';
+                
+                const spanSub = document.createElement('span');
+                spanSub.className = 'font-bold text-brand-primary';
+                spanSub.textContent = `[${q.part}부] ${q.subject}`;
+                
+                const pText = document.createElement('p');
+                pText.className = 'font-semibold text-brand-dark line-clamp-1';
+                pText.textContent = q.question;
+                
+                infoDiv.appendChild(spanSub);
+                infoDiv.appendChild(pText);
+                item.appendChild(infoDiv);
+
+                if (isCustom) {
+                    const delBtn = document.createElement('button');
+                    delBtn.className = 'text-red-500 hover:text-red-700 font-bold px-2.5 py-1 bg-red-50 rounded-xl border border-red-100';
+                    delBtn.textContent = '삭제';
+                    delBtn.addEventListener('click', () => deleteQuestion(q.id));
+                    item.appendChild(delBtn);
+                } else {
+                    const defaultBadge = document.createElement('span');
+                    defaultBadge.className = 'text-[10px] font-bold text-brand-muted bg-gray-100 px-2 py-0.5 rounded-lg';
+                    defaultBadge.textContent = '기본';
+                    item.appendChild(defaultBadge);
+                }
+                container.appendChild(item);
+            });
+        }
+
+        function renderAdminFList() {
+            const container = document.getElementById('admin-f-list');
+            if (!container) return;
+
+            container.innerHTML = '';
+            FORMULA_DB.forEach(f => {
+                const isCustom = f.id.startsWith('custom_f_');
+                const item = document.createElement('div');
+                item.className = 'bg-white p-3 rounded-2xl border border-gray-100 flex justify-between items-center text-xs shadow-sm';
+                
+                const infoDiv = document.createElement('div');
+                infoDiv.className = 'space-y-0.5 flex-1 pr-2';
+                
+                const spanName = document.createElement('span');
+                spanName.className = 'font-bold text-brand-dark';
+                spanName.textContent = f.name;
+                
+                const pFormula = document.createElement('p');
+                pFormula.className = 'text-brand-muted text-[11px] font-mono';
+                pFormula.textContent = f.formula;
+                
+                infoDiv.appendChild(spanName);
+                infoDiv.appendChild(pFormula);
+                item.appendChild(infoDiv);
+
+                if (isCustom) {
+                    const delBtn = document.createElement('button');
+                    delBtn.className = 'text-red-500 hover:text-red-700 font-bold px-2.5 py-1 bg-red-50 rounded-xl border border-red-100';
+                    delBtn.textContent = '삭제';
+                    delBtn.addEventListener('click', () => deleteFormula(f.id));
+                    item.appendChild(delBtn);
+                } else {
+                    const defaultBadge = document.createElement('span');
+                    defaultBadge.className = 'text-[10px] font-bold text-brand-muted bg-gray-100 px-2 py-0.5 rounded-lg';
+                    defaultBadge.textContent = '기본';
+                    item.appendChild(defaultBadge);
+                }
+                container.appendChild(item);
+            });
+        }
+
+        /* MODULE 5: CALC PRACTICE */
+        let calcPracticeIndex = 0;
+
+        function renderCalcPracticeModule(container) {
+            const calcQuestions = QUESTION_BANK.filter(q => q.type === 'calc');
+            const currentQ = calcQuestions[calcPracticeIndex % calcQuestions.length];
+            const formulaObj = FORMULA_DB.find(f => f.id === currentQ.formulaId) || FORMULA_DB[0];
+
+            container.innerHTML = `
+                <div class="bg-white rounded-3xl p-5 glass-shadow space-y-4 border border-emerald-900/5">
+                    <div class="border-b pb-2 flex justify-between items-center">
+                        <span class="text-xs font-black text-brand-primary bg-brand-soft px-3 py-1 rounded-full">단계별 실전 계산</span>
+                        <span class="text-xs font-bold text-brand-muted">${calcPracticeIndex + 1} / ${calcQuestions.length}</span>
+                    </div>
+
+                    <div>
+                        <h3 class="font-black text-base text-brand-dark mb-1" id="cp-question-text"></h3>
+                        <p class="text-xs text-brand-muted">공식을 상기하여 숫자를 대입하고 최종 답을 도출하세요.</p>
+                    </div>
+
+                    <div class="bg-brand-bg p-3.5 rounded-2xl border border-emerald-900/10 text-xs space-y-1">
+                        <span class="font-bold text-brand-dark block"><i class="fa-solid fa-list-ol text-brand-primary mr-1"></i>STEP 1. 필수 공식 확인</span>
+                        <p class="font-mono text-brand-primary font-bold text-sm">${escapeHTML(formulaObj.name)}: ${escapeHTML(formulaObj.formula)}</p>
+                    </div>
+
+                    <div class="space-y-2">
+                        <label class="block text-xs font-bold text-gray-700"><i class="fa-solid fa-pen text-brand-primary mr-1"></i>STEP 2. 최종 계산 수치 입력</label>
+                        <div class="flex space-x-2">
+                            <input type="number" id="calc-practice-input" placeholder="숫자만 입력" class="flex-1 border border-gray-300 rounded-2xl px-4 py-2.5 text-base font-black text-brand-dark focus:outline-none focus:border-brand-primary">
+                            <button id="cp-submit-btn" class="bg-brand-primary text-white font-black px-5 rounded-2xl shadow-md text-sm">
+                                제출
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="calc-practice-result" class="hidden p-3.5 rounded-2xl text-xs space-y-2"></div>
+
+                    <div class="flex justify-end pt-2">
+                        <button onclick="nextCalcPractice()" class="text-xs font-black text-brand-primary bg-brand-soft px-4 py-2.5 rounded-2xl">
+                            다음 계산 문제 <i class="fa-solid fa-arrow-right ml-1"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+            document.getElementById('cp-question-text').textContent = currentQ.question;
+            document.getElementById('cp-submit-btn').addEventListener('click', () => checkCalcPracticeAnswer(currentQ.id));
+        }
+
+        function checkCalcPracticeAnswer(qId) {
+            const q = QUESTION_BANK.find(item => item.id === qId);
+            const userVal = parseFloat(document.getElementById('calc-practice-input').value);
+            const resBox = document.getElementById('calc-practice-result');
+
+            if (isNaN(userVal)) {
+                showToast('올바른 숫자를 입력해주세요.');
+                return;
+            }
+
+            const isCorrect = Math.abs(userVal - q.numericAnswer) < 0.1;
+
+            resBox.classList.remove('hidden', 'bg-red-50', 'bg-emerald-50', 'text-red-800', 'text-emerald-900');
+            resBox.innerHTML = '';
+
+            const pTitle = document.createElement('p');
+            pTitle.className = 'font-bold text-sm';
+
+            const pDesc = document.createElement('p');
+            pDesc.className = 'mt-1';
+            pDesc.textContent = q.explanation;
+
+            if (isCorrect) {
+                resBox.classList.add('bg-emerald-50', 'text-emerald-900', 'border', 'border-emerald-200');
+                pTitle.textContent = '정답입니다!';
+                resBox.appendChild(pTitle);
+                resBox.appendChild(pDesc);
+                recordAnswer(q.id, true, userVal);
+            } else {
+                resBox.classList.add('bg-red-50', 'text-red-800', 'border', 'border-red-200');
+                pTitle.textContent = '오답입니다.';
+                resBox.appendChild(pTitle);
+                
+                const pAns = document.createElement('p');
+                pAns.className = 'mt-1';
+                pAns.textContent = `정답: ${q.answer}`;
+                resBox.appendChild(pAns);
+                resBox.appendChild(pDesc);
+                recordAnswer(q.id, false, userVal);
+            }
+        }
+
+        function nextCalcPractice() {
+            calcPracticeIndex++;
+            renderCalcPracticeModule(document.getElementById('view-module'));
+        }
+
+        /* MODULE 6: GENERATOR */
+        function renderGeneratorModule(container) {
+            container.innerHTML = `
+                <div class="bg-white rounded-3xl p-5 glass-shadow space-y-4 border border-emerald-900/5">
+                    <div class="border-b pb-2">
+                        <h3 class="font-black text-sm text-brand-dark"><i class="fa-solid fa-wand-magic-sparkles text-brand-primary mr-1"></i> 맞춤 문제 생성 옵션</h3>
+                    </div>
+
+                    <div class="space-y-3 text-xs">
+                        <div>
+                            <label class="block font-bold text-gray-700 mb-1">시험 영역 선택</label>
+                            <select id="gen-part" class="w-full bg-brand-bg border border-emerald-900/10 rounded-2xl p-2.5 font-bold text-brand-dark">
+                                <option value="all">전체 (1부 + 2부)</option>
+                                <option value="1">신용분석사 1부 (회계/재무)</option>
+                                <option value="2">신용분석사 2부 (평가/현금)</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block font-bold text-gray-700 mb-1">난이도 설정</label>
+                            <select id="gen-diff" class="w-full bg-brand-bg border border-emerald-900/10 rounded-2xl p-2.5 font-bold text-brand-dark">
+                                <option value="all">전체 난이도</option>
+                                <option value="초급">초급</option>
+                                <option value="중급">중급</option>
+                                <option value="고급">고급</option>
+                                <option value="실전">실전</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <button onclick="generateCustomQuiz()" class="w-full bg-brand-primary text-white font-black py-3.5 rounded-2xl text-sm shadow-md hover:bg-brand-dark transition">
+                        문제 생성 및 시작
+                    </button>
+
+                    <div id="generated-quiz-area" class="space-y-4 pt-2"></div>
+                </div>
+            `;
+        }
+
+        function generateCustomQuiz() {
+            const partVal = document.getElementById('gen-part').value;
+            const diffVal = document.getElementById('gen-diff').value;
+
+            let filtered = QUESTION_BANK.filter(q => {
+                if (partVal !== 'all' && q.part !== parseInt(partVal)) return false;
+                if (diffVal !== 'all' && q.difficulty !== diffVal) return false;
+                return true;
+            });
+
+            const targetBox = document.getElementById('generated-quiz-area');
+            if (filtered.length === 0) {
+                targetBox.innerHTML = '<p class="text-xs text-brand-muted text-center py-4">조건에 맞는 문제가 없습니다.</p>';
+                return;
+            }
+
+            const randQ = filtered[Math.floor(Math.random() * filtered.length)];
+            targetBox.innerHTML = '';
+            renderQuestionItem('generated-quiz-area', randQ);
+        }
+
+        /* MODULE 7: WRONG NOTES */
+        function renderWrongNotesModule(container) {
+            const wrongList = appState.wrongQuestions;
+
+            container.innerHTML = `
+                <div class="space-y-3">
+                    <div class="bg-white rounded-3xl p-4.5 glass-shadow flex justify-between items-center border border-emerald-900/5">
+                        <div>
+                            <h3 class="font-black text-sm text-brand-dark"><i class="fa-solid fa-book-bookmark text-brand-danger mr-1.5"></i> 누적 오답 노트</h3>
+                            <p class="text-xs text-brand-muted">반복 틀린 문제를 집중 복습하세요.</p>
+                        </div>
+                        <span class="text-lg font-black text-brand-danger bg-red-50 px-3.5 py-1 rounded-2xl">${wrongList.length}개</span>
+                    </div>
+
+                    <div id="wrong-notes-list" class="space-y-3"></div>
+                </div>
+            `;
+
+            const listEl = document.getElementById('wrong-notes-list');
+            if (wrongList.length === 0) {
+                listEl.innerHTML = `
+                    <div class="bg-white rounded-3xl p-8 text-center space-y-2 glass-shadow border border-emerald-900/5">
+                        <i class="fa-solid fa-circle-check text-brand-light text-3xl"></i>
+                        <p class="text-sm font-black text-brand-dark">현재 오답이 없습니다!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            wrongList.forEach(w => {
+                const q = QUESTION_BANK.find(item => item.id === w.questionId);
+                if (!q) return;
+
+                const card = document.createElement('div');
+                card.className = 'bg-white rounded-3xl p-4.5 glass-shadow space-y-3 border-l-4 border-brand-danger border-emerald-900/5';
+                
+                const topDiv = document.createElement('div');
+                topDiv.className = 'flex justify-between text-xs font-bold text-brand-muted';
+                
+                const spanPart = document.createElement('span');
+                spanPart.textContent = `[${q.part}부] ${q.subject}`;
+                
+                const spanCount = document.createElement('span');
+                spanCount.className = 'text-brand-danger font-black';
+                spanCount.textContent = `틀린 횟수: ${w.wrongCount}회`;
+                
+                topDiv.appendChild(spanPart);
+                topDiv.appendChild(spanCount);
+                card.appendChild(topDiv);
+
+                const pQ = document.createElement('p');
+                pQ.className = 'text-sm font-black text-brand-dark';
+                pQ.textContent = q.question;
+                card.appendChild(pQ);
+
+                const expDiv = document.createElement('div');
+                expDiv.className = 'bg-brand-bg p-3 rounded-2xl text-xs space-y-1 border border-emerald-900/10';
+                
+                const spanAns = document.createElement('span');
+                spanAns.className = 'font-black text-brand-dark';
+                spanAns.textContent = `정답: ${q.answer}`;
+                
+                const pExp = document.createElement('p');
+                pExp.className = 'text-brand-muted';
+                pExp.textContent = q.explanation;
+                
+                expDiv.appendChild(spanAns);
+                expDiv.appendChild(pExp);
+                card.appendChild(expDiv);
+
+                const btnDiv = document.createElement('div');
+                btnDiv.className = 'flex justify-end pt-1';
+                
+                const resolveBtn = document.createElement('button');
+                resolveBtn.className = 'text-xs font-black text-brand-primary bg-brand-soft px-3.5 py-2 rounded-xl';
+                resolveBtn.textContent = '복습 완료 처리';
+                resolveBtn.addEventListener('click', () => resolveWrongQuestion(q.id));
+                
+                btnDiv.appendChild(resolveBtn);
+                card.appendChild(btnDiv);
+
+                listEl.appendChild(card);
+            });
+        }
+
+        function resolveWrongQuestion(qId) {
+            appState.wrongQuestions = appState.wrongQuestions.filter(w => w.questionId !== qId);
+            saveState();
+            showToast('오답 노트에서 제거되었습니다.');
+            renderWrongNotesModule(document.getElementById('view-module'));
+        }
+
+        /* MODULE 8: DICTIONARY */
+        function renderDictionaryModule(container, highlightId) {
+            container.innerHTML = `
+                <div class="space-y-3">
+                    <div class="bg-white rounded-3xl p-4.5 glass-shadow space-y-2 border border-emerald-900/5">
+                        <h3 class="font-black text-sm text-brand-dark"><i class="fa-solid fa-spell-check text-brand-primary mr-1.5"></i> 종합 신용평가 공식 사전</h3>
+                        <input type="text" id="dict-search" onkeyup="filterDictList()" placeholder="공식명 검색 (예: ROE, 부채비율)" class="w-full bg-brand-bg border border-emerald-900/10 rounded-2xl p-2.5 text-xs font-bold text-brand-dark">
+                    </div>
+
+                    <div id="dict-list" class="space-y-3"></div>
+                </div>
+            `;
+            filterDictList();
+        }
+
+        function filterDictList() {
+            const query = (document.getElementById('dict-search')?.value || '').toLowerCase();
+            const listEl = document.getElementById('dict-list');
+            if (!listEl) return;
+
+            listEl.innerHTML = '';
+            const filtered = FORMULA_DB.filter(f => f.name.toLowerCase().includes(query) || f.cat.toLowerCase().includes(query));
+
+            filtered.forEach(f => {
+                const card = document.createElement('div');
+                card.className = 'bg-white rounded-3xl p-4.5 glass-shadow space-y-3 border border-emerald-900/5';
+                
+                card.innerHTML = `
+                    <div class="flex justify-between items-center border-b pb-2">
+                        <span class="font-black text-base text-brand-dark">${escapeHTML(f.name)}</span>
+                        <span class="text-xs font-black text-brand-primary bg-brand-soft px-2.5 py-0.5 rounded-lg">${escapeHTML(f.cat)}</span>
+                    </div>
+                    <div class="space-y-2 text-xs text-brand-dark">
+                        <div class="bg-brand-bg p-2.5 rounded-2xl border border-emerald-900/10">
+                            <span class="text-brand-primary font-bold">산식:</span> <span class="font-mono font-bold text-sm">${escapeHTML(f.formula)}</span>
+                        </div>
+                        <p><strong>· 분자:</strong> ${escapeHTML(f.num)}</p>
+                        <p><strong>· 분모:</strong> ${escapeHTML(f.den)}</p>
+                        <p><strong>· 의미:</strong> ${escapeHTML(f.meaning)}</p>
+                        <div class="grid grid-cols-2 gap-2 pt-1 text-[11px]">
+                            <div class="bg-emerald-50 text-emerald-900 p-2.5 rounded-xl border border-emerald-100">
+                                <span class="font-bold">높을 때:</span> ${escapeHTML(f.highMeaning)}
+                            </div>
+                            <div class="bg-rose-50 text-rose-900 p-2.5 rounded-xl border border-rose-100">
+                                <span class="font-bold">낮을 때:</span> ${escapeHTML(f.lowMeaning)}
+                            </div>
+                        </div>
+                        <p class="text-[11px] text-brand-muted bg-gray-50 p-2.5 rounded-xl"><strong>실전 예제:</strong> ${escapeHTML(f.ex)}</p>
+                    </div>
+                `;
+                listEl.appendChild(card);
+            });
+        }
+
+        /* MODULE 9: ANALYTICS */
+        function renderAnalyticsModule(container) {
+            const totalSolved = appState.solvedLogs.length;
+            const correctCount = appState.solvedLogs.filter(l => l.isCorrect).length;
+            const accuracy = totalSolved > 0 ? Math.round((correctCount / totalSolved) * 100) : 0;
+
+            container.innerHTML = `
+                <div class="space-y-4">
+                    <div class="bg-white rounded-3xl p-6 glass-shadow text-center space-y-2 border border-emerald-900/5">
+                        <h3 class="font-black text-sm text-brand-muted">전체 학습 성과 종합 분석</h3>
+                        <div class="text-4xl font-black text-brand-primary my-2">${accuracy}%</div>
+                        <p class="text-xs text-brand-muted">총 ${totalSolved}문제 중 ${correctCount}개 정답</p>
+                    </div>
+
+                    <div class="bg-white rounded-3xl p-5 glass-shadow space-y-3 text-xs border border-emerald-900/5">
+                        <h4 class="font-black text-sm text-brand-dark">공식 암기 마스터율</h4>
+                        <div class="flex items-center space-x-3">
+                            <div class="flex-1 bg-gray-100 rounded-full h-3 overflow-hidden">
+                                <div class="bg-brand-light h-3 rounded-full" style="width: ${Math.round((appState.masteredFormulas.length / FORMULA_DB.length) * 100)}%"></div>
+                            </div>
+                            <span class="font-black text-brand-dark">${appState.masteredFormulas.length} / ${FORMULA_DB.length}개</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        /* MODULE 10: MOCK EXAM */
+        let mockTimer = null;
+        let mockTimeLeft = 600;
+
+        function renderMockExamModule(container) {
+            container.innerHTML = `
+                <div class="bg-white rounded-3xl p-6 glass-shadow space-y-4 text-center border border-emerald-900/5">
+                    <div class="w-16 h-16 rounded-full bg-red-50 text-red-600 flex items-center justify-center mx-auto text-2xl font-bold">
+                        <i class="fa-solid fa-stopwatch"></i>
+                    </div>
+                    <h3 class="font-black text-lg text-brand-dark">신용분석사 실전 모의고사</h3>
+                    <p class="text-xs text-brand-muted">10분 간 실전과 동일한 환경에서 추출된 문제를 제한 시간 내에 제출하세요.</p>
+                    <button onclick="startMockExam()" class="bg-brand-primary text-white font-black px-6 py-3.5 rounded-2xl shadow-lg text-sm">
+                        모의고사 시작하기
+                    </button>
+                    <div id="mock-exam-area" class="text-left space-y-4 pt-4"></div>
+                </div>
+            `;
+        }
+
+        function startMockExam() {
+            const area = document.getElementById('mock-exam-area');
+            area.innerHTML = `
+                <div class="bg-brand-dark text-white p-3.5 rounded-2xl flex justify-between items-center text-xs font-black mb-3 border border-emerald-700/30">
+                    <span><i class="fa-solid fa-clock mr-1 text-brand-gold"></i>남은 시간</span>
+                    <span id="mock-timer-display" class="font-mono text-sm text-brand-gold">10:00</span>
+                </div>
+                <div id="mock-quiz-list" class="space-y-4"></div>
+                <button onclick="finishMockExam()" class="w-full bg-brand-primary text-white font-black py-3.5 rounded-2xl text-sm shadow-lg mt-4">
+                    답안 최종 제출
+                </button>
+            `;
+
+            mockTimeLeft = 600;
+            clearInterval(mockTimer);
+            mockTimer = setInterval(() => {
+                mockTimeLeft--;
+                const min = Math.floor(mockTimeLeft / 60);
+                const sec = mockTimeLeft % 60;
+                document.getElementById('mock-timer-display').textContent = `${min}:${sec < 10 ? '0' : ''}${sec}`;
+                if (mockTimeLeft <= 0) {
+                    clearInterval(mockTimer);
+                    finishMockExam();
+                }
+            }, 1000);
+
+            const quizListEl = document.getElementById('mock-quiz-list');
+            QUESTION_BANK.slice(0, 5).forEach((q) => {
+                const wrapper = document.createElement('div');
+                wrapper.id = `mock-q-${q.id}`;
+                quizListEl.appendChild(wrapper);
+                renderQuestionItem(`mock-q-${q.id}`, q);
+            });
+        }
+
+        function finishMockExam() {
+            clearInterval(mockTimer);
+            showToast('모의고사가 성공적으로 제출되었습니다!');
+            navTo('analytics');
+        }
+
+        /* ==========================================================================
+           5. SECURE QUESTION RENDERER (DOM API & EVENT LISTENERS)
+           ========================================================================== */
+
+        function renderQuestionItem(targetContainerId, q) {
+            const container = document.getElementById(targetContainerId);
+            if (!container) return;
+
+            const box = document.createElement('div');
+            box.className = 'bg-white rounded-3xl p-4.5 glass-shadow space-y-3 border border-emerald-900/5';
+
+            const topInfo = document.createElement('div');
+            topInfo.className = 'flex justify-between items-center text-xs';
+            
+            const spanPart = document.createElement('span');
+            spanPart.className = 'font-black text-brand-primary';
+            spanPart.textContent = `[${q.part}부] ${q.subject}`;
+            
+            const spanDiff = document.createElement('span');
+            spanDiff.className = 'text-brand-muted font-semibold';
+            spanDiff.textContent = `난이도: ${q.difficulty}`;
+            
+            topInfo.appendChild(spanPart);
+            topInfo.appendChild(spanDiff);
+            box.appendChild(topInfo);
+
+            const hTitle = document.createElement('h4');
+            hTitle.className = 'font-black text-sm text-brand-dark leading-relaxed';
+            hTitle.textContent = q.question;
+            box.appendChild(hTitle);
+
+            if (q.type === 'mcq' || q.type === 'calc') {
+                const optsDiv = document.createElement('div');
+                optsDiv.className = 'space-y-2 pt-2';
+                q.options.forEach((opt, i) => {
+                    const btn = document.createElement('button');
+                    btn.className = 'w-full text-left p-3 bg-brand-bg rounded-2xl text-xs font-bold text-brand-dark hover:bg-brand-soft transition border border-emerald-900/15';
+                    btn.textContent = `${i + 1}. ${opt}`;
+                    btn.addEventListener('click', () => submitAnswer(q.id, opt));
+                    optsDiv.appendChild(btn);
+                });
+                box.appendChild(optsDiv);
+            } else if (q.type === 'ox') {
+                const oxDiv = document.createElement('div');
+                oxDiv.className = 'grid grid-cols-2 gap-3 pt-2';
+                
+                ['O', 'X'].forEach(val => {
+                    const btn = document.createElement('button');
+                    btn.className = val === 'O' ? 'p-3 bg-brand-bg rounded-2xl font-black text-lg text-brand-primary border border-emerald-900/10 hover:bg-brand-soft' : 'p-3 bg-brand-bg rounded-2xl font-black text-lg text-brand-danger border border-emerald-900/10 hover:bg-red-50';
+                    btn.textContent = val;
+                    btn.addEventListener('click', () => submitAnswer(q.id, val));
+                    oxDiv.appendChild(btn);
+                });
+                box.appendChild(oxDiv);
+            } else if (q.type === 'fill') {
+                const fillDiv = document.createElement('div');
+                fillDiv.className = 'flex space-x-2 pt-2';
+                
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.id = `fill-in-${q.id}`;
+                input.placeholder = '정답 입력';
+                input.className = 'flex-1 border rounded-2xl px-3.5 py-2 text-xs font-bold text-brand-dark';
+                
+                const btn = document.createElement('button');
+                btn.className = 'bg-brand-primary text-white font-black px-4 rounded-2xl text-xs';
+                btn.textContent = '확인';
+                btn.addEventListener('click', () => submitAnswer(q.id, input.value));
+                
+                fillDiv.appendChild(input);
+                fillDiv.appendChild(btn);
+                box.appendChild(fillDiv);
+            }
+
+            const feedbackDiv = document.createElement('div');
+            feedbackDiv.id = `ans-feedback-${q.id}`;
+            feedbackDiv.className = 'hidden p-3.5 rounded-2xl text-xs space-y-1';
+            box.appendChild(feedbackDiv);
+
+            container.appendChild(box);
+        }
+
+        function submitAnswer(qId, userAns) {
+            const q = QUESTION_BANK.find(item => item.id === qId);
+            const feedbackBox = document.getElementById(`ans-feedback-${qId}`);
+            if (!q || !feedbackBox) return;
+
+            const isCorrect = userAns.toString().trim() === q.answer.toString().trim();
+
+            feedbackBox.classList.remove('hidden', 'bg-red-50', 'bg-emerald-50', 'text-red-800', 'text-emerald-900');
+            feedbackBox.innerHTML = '';
+
+            const pTitle = document.createElement('p');
+            pTitle.className = 'font-black';
+
+            const pExp = document.createElement('p');
+            pExp.className = 'mt-1';
+            pExp.textContent = q.explanation;
+
+            if (isCorrect) {
+                feedbackBox.classList.add('bg-emerald-50', 'text-emerald-900', 'border', 'border-emerald-200');
+                pTitle.textContent = '정답입니다!';
+                feedbackBox.appendChild(pTitle);
+                feedbackBox.appendChild(pExp);
+                recordAnswer(qId, true, userAns);
+            } else {
+                feedbackBox.classList.add('bg-red-50', 'text-red-800', 'border', 'border-red-200');
+                pTitle.textContent = '오답입니다.';
+                feedbackBox.appendChild(pTitle);
+
+                const pAns = document.createElement('p');
+                pAns.className = 'mt-1 font-bold';
+                pAns.textContent = `정답: ${q.answer}`;
+                feedbackBox.appendChild(pAns);
+                feedbackBox.appendChild(pExp);
+                recordAnswer(qId, false, userAns);
+            }
+        }
+
+        function recordAnswer(qId, isCorrect, userAns) {
+            appState.solvedLogs.push({
+                questionId: qId,
+                isCorrect: isCorrect,
+                userAns: userAns,
+                timestamp: Date.now()
+            });
+
+            appState.todaySolvedCount++;
+
+            if (!isCorrect) {
+                const existing = appState.wrongQuestions.find(w => w.questionId === qId);
+                if (existing) {
+                    existing.wrongCount++;
+                    existing.lastWrongDate = new Date().toISOString();
+                } else {
+                    appState.wrongQuestions.push({
+                        questionId: qId,
+                        wrongCount: 1,
+                        lastWrongDate: new Date().toISOString()
+                    });
+                }
+            }
+
+            saveState();
+        }
+
+        /* ==========================================================================
+           6. SEARCH & SAFE CALCULATOR
+           ========================================================================== */
+
+        function toggleSearchModal() {
+            document.getElementById('modal-search').classList.toggle('hidden');
+        }
+
+        function handleGlobalSearch() {
+            const query = (document.getElementById('search-input')?.value || '').toLowerCase();
+            const resEl = document.getElementById('search-results');
+            if (!resEl) return;
+
+            if (!query) {
+                resEl.innerHTML = '<p class="text-center text-xs text-brand-muted py-4">검색어를 입력하세요.</p>';
+                return;
+            }
+
+            const matchedFormulas = FORMULA_DB.filter(f => f.name.toLowerCase().includes(query));
+            resEl.innerHTML = '';
+
+            matchedFormulas.forEach(f => {
+                const item = document.createElement('div');
+                item.className = 'p-3 bg-brand-bg rounded-2xl cursor-pointer hover:bg-brand-soft border border-emerald-900/5';
+                item.addEventListener('click', () => {
+                    toggleSearchModal();
+                    navTo('dictionary', { formulaId: f.id });
+                });
+
+                const pName = document.createElement('p');
+                pName.className = 'font-black text-xs text-brand-dark';
+                pName.textContent = f.name;
+
+                const pForm = document.createElement('p');
+                pForm.className = 'text-[10px] text-brand-muted font-mono';
+                pForm.textContent = f.formula;
+
+                item.appendChild(pName);
+                item.appendChild(pForm);
+                resEl.appendChild(item);
+            });
+        }
+
+        function toggleCalcModal() {
+            document.getElementById('modal-calc').classList.toggle('hidden');
+        }
+
+        let calcExpr = '';
+        function calcKey(key) {
+            const disp = document.getElementById('calc-display');
+            const exprEl = document.getElementById('calc-expression');
+
+            if (key === 'C') {
+                calcExpr = '';
+                disp.textContent = '0';
+                exprEl.textContent = '';
+            } else if (key === '=') {
+                try {
+                    // Safe basic arithmetic parser validation
+                    if (!/^[\d\.\+\-\*\/\(\)\s]+$/.test(calcExpr)) {
+                        throw new Error('Invalid expression');
+                    }
+                    const res = Function(`"use strict"; return (${calcExpr})`)();
+                    exprEl.textContent = calcExpr + ' =';
+                    disp.textContent = Number.isInteger(res) ? res : res.toFixed(2);
+                    calcExpr = res.toString();
+                } catch (e) {
+                    disp.textContent = '오류';
+                }
+            } else {
+                calcExpr += key;
+                disp.textContent = calcExpr;
+            }
+        }
+
+        function toggleSettingsModal() {
+            document.getElementById('modal-settings').classList.toggle('hidden');
+        }
+
+        function saveSettings() {
+            const val = parseInt(document.getElementById('setting-daily-goal').value);
+            if (val > 0) appState.dailyGoal = val;
+            saveState();
+            toggleSettingsModal();
+            showToast('설정이 저장되었습니다.');
+        }
+
+        function resetAllData() {
+            if (confirm('정말로 모든 학습 데이터를 초기화하시겠습니까?')) {
+                localStorage.removeItem(STORAGE_KEY);
+                location.reload();
+            }
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-msg').textContent = msg;
+            toast.classList.remove('opacity-0');
+            setTimeout(() => toast.classList.add('opacity-0'), 2200);
+        }
+
+        /* INITIALIZATION */
+        window.onload = function() {
+            loadState();
+            updateDashboardStats();
+        };
+    </script>
+</body>
+</html>
+```
+eof
