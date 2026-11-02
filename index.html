@@ -12,21 +12,23 @@
                 extend: {
                     colors: {
                         brand: {
-                            bg: '#FDFBF7',
+                            bg: '#F8F6F0',
                             card: '#FFFFFF',
-                            dark: '#1B4332',
-                            primary: '#2D6A4F',
-                            light: '#52B788',
+                            dark: '#0F291E',
+                            primary: '#1B4332',
+                            light: '#40916C',
                             soft: '#D8F3DC',
-                            text: '#2B2D42',
-                            muted: '#6C757D',
-                            accent: '#E9C46A',
-                            danger: '#E76F51',
-                            blue: '#4A90E2'
+                            mint: '#E8F5E9',
+                            gold: '#D4AF37',
+                            goldSoft: '#FDF6E2',
+                            text: '#1E293B',
+                            muted: '#64748B',
+                            danger: '#E53E3E',
+                            accent: '#2563EB'
                         }
                     },
                     fontFamily: {
-                        sans: ['-apple-system', 'BlinkMacSystemFont', 'Apple SD Gothic Neo', 'Pretendard', 'Roboto', 'sans-serif']
+                        sans: ['-apple-system', 'BlinkMacSystemFont', 'Pretendard', 'Apple SD Gothic Neo', 'sans-serif']
                     }
                 }
             }
@@ -36,25 +38,36 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         body {
-            background-color: #FDFBF7;
-            color: #2B2D42;
-            font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Pretendard", sans-serif;
+            background-color: #F8F6F0;
+            color: #1E293B;
+            font-family: -apple-system, BlinkMacSystemFont, "Pretendard", sans-serif;
             -webkit-tap-highlight-color: transparent;
             user-select: none;
         }
 
-        /* Perspective and Flip Card CSS */
-        .perspective-1000 {
+        /* Flashcard CSS Flip Style */
+        .card-container {
             perspective: 1000px;
         }
-        .transform-style-3d {
+        .card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
             transform-style: preserve-3d;
         }
-        .backface-hidden {
-            backface-visibility: hidden;
-            -webkit-backface-visibility: hidden;
+        .card-inner.flipped {
+            transform: rotateY(180deg);
         }
-        .rotate-y-180 {
+        .card-front, .card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            border-radius: 1.25rem;
+        }
+        .card-back {
             transform: rotateY(180deg);
         }
 
@@ -72,13 +85,13 @@
             padding-bottom: env(safe-area-inset-bottom, 20px);
         }
 
-        /* Fraction Box UI for Formulas */
+        /* Elegant Fraction Box UI for Math Formulas */
         .fraction-box {
             display: inline-flex;
             flex-direction: column;
             align-items: center;
             vertical-align: middle;
-            padding: 0 4px;
+            padding: 0 6px;
         }
         .fraction-numerator {
             border-bottom: 2px solid currentColor;
@@ -91,30 +104,39 @@
             width: 100%;
             text-align: center;
         }
+
+        /* Glassmorphic Shadow */
+        .glass-shadow {
+            box-shadow: 0 10px 25px -5px rgba(15, 41, 30, 0.05), 0 8px 10px -6px rgba(15, 41, 30, 0.03);
+        }
     </style>
 </head>
-<body class="flex flex-col min-h-screen bg-brand-bg text-brand-text max-w-md mx-auto relative shadow-2xl border-x border-gray-200">
+<body class="flex flex-col min-h-screen bg-brand-bg text-brand-text max-w-md mx-auto relative border-x border-emerald-900/10 shadow-2xl">
 
     <!-- TOP HEADER -->
-    <header class="sticky top-0 z-40 bg-brand-dark text-white px-4 py-3 shadow-md flex items-center justify-between">
-        <div class="flex items-center space-x-2">
-            <button id="btn-back" onclick="navTo('dashboard')" class="hidden text-white hover:text-brand-soft pr-1 text-lg">
+    <header class="sticky top-0 z-40 bg-brand-dark text-white px-4 py-3.5 shadow-lg flex items-center justify-between border-b border-emerald-800/30">
+        <div class="flex items-center space-x-2.5">
+            <button id="btn-back" onclick="navTo('dashboard')" class="hidden text-white/80 hover:text-white pr-1 text-lg">
                 <i class="fa-solid fa-chevron-left"></i>
             </button>
-            <i class="fa-solid fa-file-invoice-dollar text-brand-light text-xl"></i>
-            <h1 id="header-title" class="font-bold text-lg tracking-tight">신용분석사 올인원</h1>
+            <div class="w-8 h-8 rounded-lg bg-brand-gold/20 flex items-center justify-center border border-brand-gold/40">
+                <i class="fa-solid fa-award text-brand-gold text-base"></i>
+            </div>
+            <div>
+                <h1 id="header-title" class="font-extrabold text-base tracking-tight text-emerald-50">신용분석사 올인원</h1>
+            </div>
         </div>
         <div class="flex items-center space-x-3">
-            <button onclick="navTo('admin')" class="text-white hover:text-brand-soft p-1" title="콘텐츠/문제 관리자">
+            <button onclick="navTo('admin')" class="text-white/80 hover:text-brand-gold transition p-1" title="콘텐츠/문제 관리자">
                 <i class="fa-solid fa-sliders text-lg"></i>
             </button>
-            <button onclick="toggleSearchModal()" class="text-white hover:text-brand-soft p-1">
+            <button onclick="toggleSearchModal()" class="text-white/80 hover:text-brand-gold transition p-1">
                 <i class="fa-solid fa-magnifying-glass text-lg"></i>
             </button>
-            <button onclick="toggleCalcModal()" class="text-white hover:text-brand-soft p-1">
+            <button onclick="toggleCalcModal()" class="text-white/80 hover:text-brand-gold transition p-1">
                 <i class="fa-solid fa-calculator text-lg"></i>
             </button>
-            <button onclick="toggleSettingsModal()" class="text-white hover:text-brand-soft p-1">
+            <button onclick="toggleSettingsModal()" class="text-white/80 hover:text-brand-gold transition p-1">
                 <i class="fa-solid fa-gear text-lg"></i>
             </button>
         </div>
@@ -125,56 +147,63 @@
 
         <!-- DASHBOARD VIEW -->
         <section id="view-dashboard" class="space-y-5">
-            <!-- Daily Quote / Target Banner -->
-            <div class="bg-gradient-to-r from-brand-primary to-brand-dark text-white rounded-2xl p-4 shadow-lg flex justify-between items-center">
-                <div>
-                    <span class="text-xs font-semibold px-2 py-0.5 rounded bg-brand-light bg-opacity-30 text-brand-soft uppercase tracking-wider">Today's Goal</span>
-                    <h2 class="text-xl font-bold mt-1" id="dash-greeting">오늘도 합격을 향해!</h2>
-                    <p class="text-xs text-gray-200 mt-1" id="dash-subtext">목표 문제 20개 중 <span id="dash-today-count-badge" class="font-bold text-brand-accent">0</span>개 완료</p>
+            <!-- Premium Banner -->
+            <div class="bg-gradient-to-br from-brand-dark via-brand-primary to-emerald-950 text-white rounded-3xl p-5 shadow-xl relative overflow-hidden border border-emerald-700/30">
+                <div class="absolute -right-4 -bottom-4 w-32 h-32 bg-brand-gold/10 rounded-full blur-2xl pointer-events-none"></div>
+                <div class="relative z-10 flex justify-between items-start">
+                    <div>
+                        <span class="text-[11px] font-bold px-2.5 py-1 rounded-full bg-brand-gold/20 text-brand-gold border border-brand-gold/30 tracking-wide uppercase">DAILY MISSION</span>
+                        <h2 class="text-xl font-black mt-2 text-white tracking-tight" id="dash-greeting">오늘도 합격을 향해!</h2>
+                        <p class="text-xs text-emerald-100/80 mt-1" id="dash-subtext">목표 문제 20개 중 <span id="dash-today-count-badge" class="font-extrabold text-brand-gold text-sm">0</span>개 완료</p>
+                    </div>
+                    <button onclick="navTo('today')" class="bg-brand-gold hover:bg-yellow-500 text-brand-dark px-3.5 py-2 rounded-2xl text-xs font-black shadow-lg transition flex items-center space-x-1 border border-yellow-200">
+                        <span>오늘 학습</span>
+                        <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                    </button>
                 </div>
-                <button onclick="navTo('today')" class="bg-white text-brand-dark px-3 py-2 rounded-xl text-xs font-bold shadow-md hover:bg-brand-soft transition">
-                    오늘의 학습 <i class="fa-solid fa-arrow-right ml-1"></i>
-                </button>
             </div>
 
             <!-- KEY STATS WIDGET -->
-            <div class="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
-                <h3 class="text-sm font-bold text-gray-700 mb-3 flex items-center justify-between">
-                    <span><i class="fa-solid fa-chart-line text-brand-primary mr-1.5"></i>학습 현황 리포트</span>
-                    <span class="text-xs font-normal text-brand-muted" id="stat-last-updated">실시간 업데이트</span>
-                </h3>
-                <div class="grid grid-cols-3 gap-2 text-center mb-3">
-                    <div class="bg-brand-bg rounded-xl p-2.5">
-                        <span class="text-xs text-brand-muted block">총 풀이</span>
-                        <span id="stat-total-solved" class="text-lg font-extrabold text-brand-primary">0</span>
+            <div class="bg-white rounded-3xl p-4.5 glass-shadow border border-emerald-900/5 space-y-3.5">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-black text-brand-dark flex items-center">
+                        <i class="fa-solid fa-chart-line text-brand-primary mr-1.5"></i>학습 현황 리포트
+                    </span>
+                    <span class="text-[10px] font-semibold text-brand-muted" id="stat-last-updated">실시간 자동 저장</span>
+                </div>
+                
+                <div class="grid grid-cols-3 gap-2.5 text-center">
+                    <div class="bg-brand-bg rounded-2xl p-3 border border-emerald-900/5">
+                        <span class="text-[11px] font-semibold text-brand-muted block">총 풀이</span>
+                        <span id="stat-total-solved" class="text-lg font-black text-brand-primary">0</span>
                     </div>
-                    <div class="bg-brand-bg rounded-xl p-2.5">
-                        <span class="text-xs text-brand-muted block">누적 정답률</span>
-                        <span id="stat-accuracy" class="text-lg font-extrabold text-brand-dark">0%</span>
+                    <div class="bg-brand-bg rounded-2xl p-3 border border-emerald-900/5">
+                        <span class="text-[11px] font-semibold text-brand-muted block">누적 정답률</span>
+                        <span id="stat-accuracy" class="text-lg font-black text-brand-dark">0%</span>
                     </div>
-                    <div class="bg-brand-bg rounded-xl p-2.5">
-                        <span class="text-xs text-brand-muted block">마스터 공식</span>
-                        <span id="stat-mastered-formulas" class="text-lg font-extrabold text-brand-light">0</span>
+                    <div class="bg-brand-bg rounded-2xl p-3 border border-emerald-900/5">
+                        <span class="text-[11px] font-semibold text-brand-muted block">마스터 공식</span>
+                        <span id="stat-mastered-formulas" class="text-lg font-black text-emerald-600">0</span>
                     </div>
                 </div>
                 
                 <!-- Subject Progress Bars -->
-                <div class="space-y-2 pt-2 border-t border-gray-100">
+                <div class="space-y-2.5 pt-2 border-t border-gray-100">
                     <div>
-                        <div class="flex justify-between text-xs font-semibold mb-1">
-                            <span class="text-gray-600"><i class="fa-solid fa-book-open text-brand-primary mr-1"></i>신용분석사 1부 (회계학/재무제표)</span>
+                        <div class="flex justify-between text-xs font-bold mb-1">
+                            <span class="text-gray-700"><i class="fa-solid fa-book-open text-brand-primary mr-1"></i>신용분석사 1부 (회계학)</span>
                             <span id="part1-progress-percent" class="text-brand-primary">0%</span>
                         </div>
-                        <div class="w-full bg-gray-100 rounded-full h-2">
+                        <div class="w-full bg-gray-100 rounded-full h-2 overflow-hidden">
                             <div id="part1-progress-bar" class="bg-brand-primary h-2 rounded-full transition-all duration-500" style="width: 0%"></div>
                         </div>
                     </div>
                     <div>
-                        <div class="flex justify-between text-xs font-semibold mb-1">
-                            <span class="text-gray-600"><i class="fa-solid fa-scale-balanced text-brand-primary mr-1"></i>신용분석사 2부 (신용평가/현금흐름)</span>
-                            <span id="part2-progress-percent" class="text-brand-primary">0%</span>
+                        <div class="flex justify-between text-xs font-bold mb-1">
+                            <span class="text-gray-700"><i class="fa-solid fa-scale-balanced text-brand-light mr-1"></i>신용분석사 2부 (신용평가)</span>
+                            <span id="part2-progress-percent" class="text-brand-light">0%</span>
                         </div>
-                        <div class="w-full bg-gray-100 rounded-full h-2">
+                        <div class="w-full bg-gray-100 rounded-full h-2 overflow-hidden">
                             <div id="part2-progress-bar" class="bg-brand-light h-2 rounded-full transition-all duration-500" style="width: 0%"></div>
                         </div>
                     </div>
@@ -183,295 +212,294 @@
 
             <!-- QUICK ACCESS MENU CARDS (10 Modules) -->
             <div>
-                <h3 class="text-sm font-bold text-gray-700 mb-3 flex items-center">
+                <h3 class="text-xs font-black text-brand-muted mb-3 flex items-center px-1 uppercase tracking-wider">
                     <i class="fa-solid fa-cubes text-brand-primary mr-1.5"></i>학습 모듈 선택
                 </h3>
                 <div class="grid grid-cols-2 gap-3">
                     <!-- 1. 오늘의 학습 -->
-                    <div onclick="navTo('today')" class="bg-white p-3.5 rounded-2xl shadow-sm border border-gray-100 hover:border-brand-light transition cursor-pointer flex flex-col justify-between h-28">
+                    <div onclick="navTo('today')" class="bg-white p-4 rounded-3xl glass-shadow border border-emerald-900/5 hover:border-brand-light/40 transition cursor-pointer flex flex-col justify-between h-32 active:scale-95">
                         <div class="flex items-center justify-between">
-                            <div class="w-9 h-9 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center font-bold text-base">
+                            <div class="w-10 h-10 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center font-bold text-lg shadow-sm">
                                 <i class="fa-solid fa-star"></i>
                             </div>
-                            <span class="text-[10px] font-bold text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded">추천</span>
+                            <span class="text-[10px] font-black text-amber-700 bg-amber-100/70 px-2 py-0.5 rounded-full">HOT</span>
                         </div>
                         <div>
-                            <h4 class="font-bold text-sm text-gray-800">1. 오늘의 학습</h4>
-                            <p class="text-[11px] text-gray-500 line-clamp-1">맞춤 약점 보완 추천 문제</p>
+                            <h4 class="font-black text-sm text-brand-dark">1. 오늘의 학습</h4>
+                            <p class="text-[11px] font-medium text-brand-muted line-clamp-1 mt-0.5">취약점 맞춤 추천 문제</p>
                         </div>
                     </div>
 
                     <!-- 2. 신용분석사 1부 -->
-                    <div onclick="navTo('part1')" class="bg-white p-3.5 rounded-2xl shadow-sm border border-gray-100 hover:border-brand-light transition cursor-pointer flex flex-col justify-between h-28">
+                    <div onclick="navTo('part1')" class="bg-white p-4 rounded-3xl glass-shadow border border-emerald-900/5 hover:border-brand-light/40 transition cursor-pointer flex flex-col justify-between h-32 active:scale-95">
                         <div class="flex items-center justify-between">
-                            <div class="w-9 h-9 rounded-xl bg-emerald-50 text-brand-primary flex items-center justify-center font-bold text-base">
+                            <div class="w-10 h-10 rounded-2xl bg-emerald-50 text-brand-primary flex items-center justify-center font-black text-sm shadow-sm">
                                 1부
                             </div>
                             <i class="fa-solid fa-chevron-right text-xs text-gray-300"></i>
                         </div>
                         <div>
-                            <h4 class="font-bold text-sm text-gray-800">2. 신용분석사 1부</h4>
-                            <p class="text-[11px] text-gray-500 line-clamp-1">회계학, 기업회계기준</p>
+                            <h4 class="font-black text-sm text-brand-dark">2. 신용분석사 1부</h4>
+                            <p class="text-[11px] font-medium text-brand-muted line-clamp-1 mt-0.5">회계학 및 재무제표</p>
                         </div>
                     </div>
 
                     <!-- 3. 신용분석사 2부 -->
-                    <div onclick="navTo('part2')" class="bg-white p-3.5 rounded-2xl shadow-sm border border-gray-100 hover:border-brand-light transition cursor-pointer flex flex-col justify-between h-28">
+                    <div onclick="navTo('part2')" class="bg-white p-4 rounded-3xl glass-shadow border border-emerald-900/5 hover:border-brand-light/40 transition cursor-pointer flex flex-col justify-between h-32 active:scale-95">
                         <div class="flex items-center justify-between">
-                            <div class="w-9 h-9 rounded-xl bg-teal-50 text-teal-700 flex items-center justify-center font-bold text-base">
+                            <div class="w-10 h-10 rounded-2xl bg-teal-50 text-teal-700 flex items-center justify-center font-black text-sm shadow-sm">
                                 2부
                             </div>
                             <i class="fa-solid fa-chevron-right text-xs text-gray-300"></i>
                         </div>
                         <div>
-                            <h4 class="font-bold text-sm text-gray-800">3. 신용분석사 2부</h4>
-                            <p class="text-[11px] text-gray-500 line-clamp-1">신용평가, 현금흐름분석</p>
+                            <h4 class="font-black text-sm text-brand-dark">3. 신용분석사 2부</h4>
+                            <p class="text-[11px] font-medium text-brand-muted line-clamp-1 mt-0.5">신용평가 & 현금흐름</p>
                         </div>
                     </div>
 
                     <!-- 4. 공식 암기 플래시카드 -->
-                    <div onclick="navTo('flashcard')" class="bg-white p-3.5 rounded-2xl shadow-sm border border-gray-100 hover:border-brand-light transition cursor-pointer flex flex-col justify-between h-28">
+                    <div onclick="navTo('flashcard')" class="bg-white p-4 rounded-3xl glass-shadow border border-emerald-900/5 hover:border-brand-light/40 transition cursor-pointer flex flex-col justify-between h-32 active:scale-95">
                         <div class="flex items-center justify-between">
-                            <div class="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center font-bold text-base">
+                            <div class="w-10 h-10 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center font-bold text-lg shadow-sm">
                                 <i class="fa-solid fa-clone"></i>
                             </div>
-                            <span id="flashcard-badge" class="text-[10px] font-bold text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded">30+공식</span>
+                            <span id="flashcard-badge" class="text-[10px] font-black text-blue-700 bg-blue-100/70 px-2 py-0.5 rounded-full">공식암기</span>
                         </div>
                         <div>
-                            <h4 class="font-bold text-sm text-gray-800">4. 공식 플래시카드</h4>
-                            <p class="text-[11px] text-gray-500 line-clamp-1">핵심 비율 산식 반복암기</p>
+                            <h4 class="font-black text-sm text-brand-dark">4. 공식 플래시카드</h4>
+                            <p class="text-[11px] font-medium text-brand-muted line-clamp-1 mt-0.5">산식 완전정복 터치암기</p>
                         </div>
                     </div>
 
                     <!-- 5. 공식 계산 연습 -->
-                    <div onclick="navTo('calc_practice')" class="bg-white p-3.5 rounded-2xl shadow-sm border border-gray-100 hover:border-brand-light transition cursor-pointer flex flex-col justify-between h-28">
+                    <div onclick="navTo('calc_practice')" class="bg-white p-4 rounded-3xl glass-shadow border border-emerald-900/5 hover:border-brand-light/40 transition cursor-pointer flex flex-col justify-between h-32 active:scale-95">
                         <div class="flex items-center justify-between">
-                            <div class="w-9 h-9 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold text-base">
+                            <div class="w-10 h-10 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold text-lg shadow-sm">
                                 <i class="fa-solid fa-square-root-variable"></i>
                             </div>
                             <i class="fa-solid fa-chevron-right text-xs text-gray-300"></i>
                         </div>
                         <div>
-                            <h4 class="font-bold text-sm text-gray-800">5. 공식 계산 연습</h4>
-                            <p class="text-[11px] text-gray-500 line-clamp-1">단계별 수치 대입/계산</p>
+                            <h4 class="font-black text-sm text-brand-dark">5. 공식 계산 연습</h4>
+                            <p class="text-[11px] font-medium text-brand-muted line-clamp-1 mt-0.5">단계별 수치 계산 훈련</p>
                         </div>
                     </div>
 
                     <!-- 6. 자동 생성 문제풀이 -->
-                    <div onclick="navTo('generator')" class="bg-white p-3.5 rounded-2xl shadow-sm border border-gray-100 hover:border-brand-light transition cursor-pointer flex flex-col justify-between h-28">
+                    <div onclick="navTo('generator')" class="bg-white p-4 rounded-3xl glass-shadow border border-emerald-900/5 hover:border-brand-light/40 transition cursor-pointer flex flex-col justify-between h-32 active:scale-95">
                         <div class="flex items-center justify-between">
-                            <div class="w-9 h-9 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center font-bold text-base">
+                            <div class="w-10 h-10 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center font-bold text-lg shadow-sm">
                                 <i class="fa-solid fa-wand-magic-sparkles"></i>
                             </div>
                             <i class="fa-solid fa-chevron-right text-xs text-gray-300"></i>
                         </div>
                         <div>
-                            <h4 class="font-bold text-sm text-gray-800">6. 자동 생성 문제</h4>
-                            <p class="text-[11px] text-gray-500 line-clamp-1">난이도별 맞춤 문제풀이</p>
+                            <h4 class="font-black text-sm text-brand-dark">6. 자동 생성 문제</h4>
+                            <p class="text-[11px] font-medium text-brand-muted line-clamp-1 mt-0.5">난이도별 맞춤 문제풀이</p>
                         </div>
                     </div>
 
                     <!-- 7. 오답 노트 -->
-                    <div onclick="navTo('wrong_notes')" class="bg-white p-3.5 rounded-2xl shadow-sm border border-gray-100 hover:border-brand-light transition cursor-pointer flex flex-col justify-between h-28">
+                    <div onclick="navTo('wrong_notes')" class="bg-white p-4 rounded-3xl glass-shadow border border-emerald-900/5 hover:border-brand-light/40 transition cursor-pointer flex flex-col justify-between h-32 active:scale-95">
                         <div class="flex items-center justify-between">
-                            <div class="w-9 h-9 rounded-xl bg-orange-50 text-orange-600 flex items-center justify-center font-bold text-base">
+                            <div class="w-10 h-10 rounded-2xl bg-orange-50 text-orange-600 flex items-center justify-center font-bold text-lg shadow-sm">
                                 <i class="fa-solid fa-book-bookmark"></i>
                             </div>
-                            <span id="wrong-count-badge" class="text-[10px] font-bold text-white bg-orange-500 px-1.5 py-0.5 rounded-full">0</span>
+                            <span id="wrong-count-badge" class="text-[10px] font-black text-white bg-brand-danger px-2 py-0.5 rounded-full">0</span>
                         </div>
                         <div>
-                            <h4 class="font-bold text-sm text-gray-800">7. 취약 오답노트</h4>
-                            <p class="text-[11px] text-gray-500 line-clamp-1">반복 틀린 문제 재학습</p>
+                            <h4 class="font-black text-sm text-brand-dark">7. 취약 오답노트</h4>
+                            <p class="text-[11px] font-medium text-brand-muted line-clamp-1 mt-0.5">반복 틀린 문제 재학습</p>
                         </div>
                     </div>
 
                     <!-- 8. 종합신용평가 공식집 -->
-                    <div onclick="navTo('dictionary')" class="bg-white p-3.5 rounded-2xl shadow-sm border border-gray-100 hover:border-brand-light transition cursor-pointer flex flex-col justify-between h-28">
+                    <div onclick="navTo('dictionary')" class="bg-white p-4 rounded-3xl glass-shadow border border-emerald-900/5 hover:border-brand-light/40 transition cursor-pointer flex flex-col justify-between h-32 active:scale-95">
                         <div class="flex items-center justify-between">
-                            <div class="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center font-bold text-base">
+                            <div class="w-10 h-10 rounded-2xl bg-emerald-50 text-emerald-700 flex items-center justify-center font-bold text-lg shadow-sm">
                                 <i class="fa-solid fa-spell-check"></i>
                             </div>
                             <i class="fa-solid fa-chevron-right text-xs text-gray-300"></i>
                         </div>
                         <div>
-                            <h4 class="font-bold text-sm text-gray-800">8. 종합 공식 사전</h4>
-                            <p class="text-[11px] text-gray-500 line-clamp-1">분자/분모/해석지표 정밀사전</p>
+                            <h4 class="font-black text-sm text-brand-dark">8. 종합 공식 사전</h4>
+                            <p class="text-[11px] font-medium text-brand-muted line-clamp-1 mt-0.5">분자/분모 정밀 공식집</p>
                         </div>
                     </div>
 
                     <!-- 9. 학습 진도 및 정답률 -->
-                    <div onclick="navTo('analytics')" class="bg-white p-3.5 rounded-2xl shadow-sm border border-gray-100 hover:border-brand-light transition cursor-pointer flex flex-col justify-between h-28">
+                    <div onclick="navTo('analytics')" class="bg-white p-4 rounded-3xl glass-shadow border border-emerald-900/5 hover:border-brand-light/40 transition cursor-pointer flex flex-col justify-between h-32 active:scale-95">
                         <div class="flex items-center justify-between">
-                            <div class="w-9 h-9 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center font-bold text-base">
+                            <div class="w-10 h-10 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center font-bold text-lg shadow-sm">
                                 <i class="fa-solid fa-chart-pie"></i>
                             </div>
                             <i class="fa-solid fa-chevron-right text-xs text-gray-300"></i>
                         </div>
                         <div>
-                            <h4 class="font-bold text-sm text-gray-800">9. 진도 및 통계</h4>
-                            <p class="text-[11px] text-gray-500 line-clamp-1">과목별 정답률 데이터 분석</p>
+                            <h4 class="font-black text-sm text-brand-dark">9. 진도 및 통계</h4>
+                            <p class="text-[11px] font-medium text-brand-muted line-clamp-1 mt-0.5">정답률 데이터 다이어그램</p>
                         </div>
                     </div>
 
                     <!-- 10. 실전 모의고사 -->
-                    <div onclick="navTo('mock_exam')" class="bg-white p-3.5 rounded-2xl shadow-sm border border-gray-100 hover:border-brand-light transition cursor-pointer flex flex-col justify-between h-28">
+                    <div onclick="navTo('mock_exam')" class="bg-white p-4 rounded-3xl glass-shadow border border-emerald-900/5 hover:border-brand-light/40 transition cursor-pointer flex flex-col justify-between h-32 active:scale-95">
                         <div class="flex items-center justify-between">
-                            <div class="w-9 h-9 rounded-xl bg-red-50 text-red-600 flex items-center justify-center font-bold text-base">
-                                <i class="fa-solid fa-clock"></i>
+                            <div class="w-10 h-10 rounded-2xl bg-red-50 text-red-600 flex items-center justify-center font-bold text-lg shadow-sm">
+                                <i class="fa-solid fa-stopwatch"></i>
                             </div>
-                            <span class="text-[10px] font-bold text-red-600 bg-red-50 px-1.5 py-0.5 rounded">실전</span>
+                            <span class="text-[10px] font-black text-red-700 bg-red-100/70 px-2 py-0.5 rounded-full">실전</span>
                         </div>
                         <div>
-                            <h4 class="font-bold text-sm text-gray-800">10. 실전 모의고사</h4>
-                            <p class="text-[11px] text-gray-500 line-clamp-1">타이머 적용 실전 평가</p>
+                            <h4 class="font-black text-sm text-brand-dark">10. 실전 모의고사</h4>
+                            <p class="text-[11px] font-medium text-brand-muted line-clamp-1 mt-0.5">타이머 적용 실전 문제</p>
                         </div>
                     </div>
                 </div>
             </div>
 
             <!-- 11. Custom Admin Banner -->
-            <div onclick="navTo('admin')" class="bg-gradient-to-r from-emerald-800 to-brand-dark text-white p-3.5 rounded-2xl shadow-md flex justify-between items-center cursor-pointer hover:opacity-95 transition">
-                <div class="flex items-center space-x-3">
-                    <div class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-brand-soft text-lg font-bold">
+            <div onclick="navTo('admin')" class="bg-gradient-to-r from-brand-dark to-brand-primary text-white p-4 rounded-3xl shadow-lg flex justify-between items-center cursor-pointer hover:opacity-95 transition border border-emerald-700/30">
+                <div class="flex items-center space-x-3.5">
+                    <div class="w-11 h-11 rounded-2xl bg-white/10 flex items-center justify-center text-brand-gold text-xl font-bold border border-white/10">
                         <i class="fa-solid fa-pen-to-square"></i>
                     </div>
                     <div>
-                        <h4 class="font-bold text-sm">문제/공식 수정 & 관리자 모드</h4>
-                        <p class="text-xs text-brand-soft">나만의 문제 추가, JSON 백업/업데이트</p>
+                        <h4 class="font-black text-sm text-emerald-50">문제/공식 수정 & 커스텀 관리자</h4>
+                        <p class="text-xs text-emerald-200/80 mt-0.5">나만의 문제 등록, JSON 백업/업데이트</p>
                     </div>
                 </div>
-                <i class="fa-solid fa-chevron-right text-sm text-brand-soft"></i>
+                <i class="fa-solid fa-chevron-right text-sm text-brand-gold"></i>
             </div>
         </section>
 
-        <!-- Dynamic Content Section Container (Filled by JS) -->
+        <!-- Dynamic Content Section Container -->
         <section id="view-module" class="hidden space-y-4">
-            <!-- Dynamic Module Content HTML goes here -->
         </section>
 
     </main>
 
     <!-- BOTTOM FIXED NAVBAR -->
-    <nav class="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-white border-t border-gray-200 px-2 py-1.5 flex justify-around items-center z-30 pb-safe">
+    <nav class="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-white/95 backdrop-blur-md border-t border-emerald-900/10 px-3 py-2 flex justify-around items-center z-30 pb-safe shadow-lg">
         <button onclick="navTo('dashboard')" id="nav-item-dash" class="flex flex-col items-center p-1 text-brand-primary">
             <i class="fa-solid fa-house text-lg"></i>
-            <span class="text-[10px] font-medium mt-0.5">홈</span>
+            <span class="text-[10px] font-bold mt-1">홈</span>
         </button>
         <button onclick="navTo('flashcard')" id="nav-item-flashcard" class="flex flex-col items-center p-1 text-gray-400 hover:text-brand-primary">
             <i class="fa-solid fa-clone text-lg"></i>
-            <span class="text-[10px] font-medium mt-0.5">플래시카드</span>
+            <span class="text-[10px] font-bold mt-1">플래시카드</span>
         </button>
         <button onclick="navTo('calc_practice')" id="nav-item-calc" class="flex flex-col items-center p-1 text-gray-400 hover:text-brand-primary">
             <i class="fa-solid fa-calculator text-lg"></i>
-            <span class="text-[10px] font-medium mt-0.5">계산연습</span>
+            <span class="text-[10px] font-bold mt-1">계산연습</span>
         </button>
         <button onclick="navTo('wrong_notes')" id="nav-item-wrong" class="flex flex-col items-center p-1 text-gray-400 hover:text-brand-primary relative">
             <i class="fa-solid fa-book-bookmark text-lg"></i>
-            <span class="text-[10px] font-medium mt-0.5">오답노트</span>
+            <span class="text-[10px] font-bold mt-1">오답노트</span>
             <span id="nav-wrong-dot" class="hidden absolute top-1 right-2 w-2 h-2 rounded-full bg-brand-danger"></span>
         </button>
         <button onclick="navTo('dictionary')" id="nav-item-dict" class="flex flex-col items-center p-1 text-gray-400 hover:text-brand-primary">
             <i class="fa-solid fa-spell-check text-lg"></i>
-            <span class="text-[10px] font-medium mt-0.5">공식집</span>
+            <span class="text-[10px] font-bold mt-1">공식집</span>
         </button>
     </nav>
 
     <!-- SEARCH MODAL -->
-    <div id="modal-search" class="fixed inset-0 bg-black/50 z-50 flex items-start justify-center pt-16 px-4 hidden">
-        <div class="bg-white w-full max-w-md rounded-2xl p-4 shadow-xl space-y-3">
-            <div class="flex justify-between items-center pb-2 border-b">
-                <h3 class="font-bold text-gray-800"><i class="fa-solid fa-magnifying-glass text-brand-primary mr-1"></i> 공식 / 단원 검색</h3>
-                <button onclick="toggleSearchModal()" class="text-gray-400 hover:text-gray-600 text-lg">&times;</button>
+    <div id="modal-search" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-start justify-center pt-16 px-4 hidden">
+        <div class="bg-white w-full max-w-md rounded-3xl p-5 shadow-2xl space-y-3.5 border border-emerald-900/10">
+            <div class="flex justify-between items-center pb-2 border-b border-gray-100">
+                <h3 class="font-black text-base text-brand-dark"><i class="fa-solid fa-magnifying-glass text-brand-primary mr-1.5"></i> 공식 / 단원 검색</h3>
+                <button onclick="toggleSearchModal()" class="text-gray-400 hover:text-gray-600 text-xl font-bold">&times;</button>
             </div>
-            <input type="text" id="search-input" onkeyup="handleGlobalSearch()" placeholder="예: ROE, 이자보상배율, 유동비율..." class="w-full bg-gray-100 border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-brand-primary">
-            <div id="search-results" class="max-h-60 overflow-y-auto space-y-2 text-sm">
-                <p class="text-center text-xs text-gray-400 py-4">검색어를 입력하세요.</p>
+            <input type="text" id="search-input" onkeyup="handleGlobalSearch()" placeholder="예: ROE, 이자보상배율, 유동비율..." class="w-full bg-brand-bg border border-emerald-900/10 rounded-2xl px-4 py-2.5 text-sm font-bold text-brand-dark focus:outline-none focus:border-brand-primary">
+            <div id="search-results" class="max-h-60 overflow-y-auto space-y-2 text-sm no-scrollbar">
+                <p class="text-center text-xs text-brand-muted py-4 font-medium">검색어를 입력하세요.</p>
             </div>
         </div>
     </div>
 
     <!-- QUICK CALCULATOR MODAL -->
-    <div id="modal-calc" class="fixed inset-0 bg-black/50 z-50 flex items-end justify-center hidden">
-        <div class="bg-white w-full max-w-md rounded-t-3xl p-5 shadow-2xl space-y-3 animate-slide-up">
+    <div id="modal-calc" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-end justify-center hidden">
+        <div class="bg-white w-full max-w-md rounded-t-3xl p-5 shadow-2xl space-y-3 border-t border-emerald-900/10">
             <div class="flex justify-between items-center border-b pb-2">
-                <span class="font-bold text-sm text-gray-700"><i class="fa-solid fa-calculator text-brand-primary mr-1"></i> 신용분석 전용 계산기</span>
-                <button onclick="toggleCalcModal()" class="text-gray-400 hover:text-gray-600 text-lg">&times;</button>
+                <span class="font-black text-sm text-brand-dark"><i class="fa-solid fa-calculator text-brand-primary mr-1.5"></i> 신용분석 전용 계산기</span>
+                <button onclick="toggleCalcModal()" class="text-gray-400 hover:text-gray-600 text-xl font-bold">&times;</button>
             </div>
             <!-- Calculator Display -->
-            <div class="bg-brand-bg rounded-xl p-3 text-right">
-                <div id="calc-expression" class="text-xs text-gray-400 h-4"></div>
-                <div id="calc-display" class="text-2xl font-bold font-mono text-brand-dark tracking-wide">0</div>
+            <div class="bg-brand-bg rounded-2xl p-3.5 text-right border border-emerald-900/10">
+                <div id="calc-expression" class="text-xs text-brand-muted h-4 font-mono"></div>
+                <div id="calc-display" class="text-2xl font-black font-mono text-brand-dark tracking-wide">0</div>
             </div>
             <!-- Keypad -->
-            <div class="grid grid-cols-4 gap-2 text-sm">
-                <button onclick="calcKey('C')" class="p-3 bg-red-100 text-red-600 font-bold rounded-xl">C</button>
-                <button onclick="calcKey('(')" class="p-3 bg-gray-100 font-bold rounded-xl">(</button>
-                <button onclick="calcKey(')')" class="p-3 bg-gray-100 font-bold rounded-xl">)</button>
-                <button onclick="calcKey('/')" class="p-3 bg-brand-soft text-brand-dark font-bold rounded-xl">÷</button>
+            <div class="grid grid-cols-4 gap-2 text-sm font-bold">
+                <button onclick="calcKey('C')" class="p-3.5 bg-red-100 text-red-600 rounded-2xl hover:bg-red-200">C</button>
+                <button onclick="calcKey('(')" class="p-3.5 bg-gray-100 text-gray-700 rounded-2xl hover:bg-gray-200">(</button>
+                <button onclick="calcKey(')')" class="p-3.5 bg-gray-100 text-gray-700 rounded-2xl hover:bg-gray-200">)</button>
+                <button onclick="calcKey('/')" class="p-3.5 bg-brand-soft text-brand-dark rounded-2xl hover:bg-emerald-200">÷</button>
 
-                <button onclick="calcKey('7')" class="p-3 bg-gray-50 font-semibold rounded-xl">7</button>
-                <button onclick="calcKey('8')" class="p-3 bg-gray-50 font-semibold rounded-xl">8</button>
-                <button onclick="calcKey('9')" class="p-3 bg-gray-50 font-semibold rounded-xl">9</button>
-                <button onclick="calcKey('*')" class="p-3 bg-brand-soft text-brand-dark font-bold rounded-xl">×</button>
+                <button onclick="calcKey('7')" class="p-3.5 bg-gray-50 text-brand-dark rounded-2xl hover:bg-gray-100">7</button>
+                <button onclick="calcKey('8')" class="p-3.5 bg-gray-50 text-brand-dark rounded-2xl hover:bg-gray-100">8</button>
+                <button onclick="calcKey('9')" class="p-3.5 bg-gray-50 text-brand-dark rounded-2xl hover:bg-gray-100">9</button>
+                <button onclick="calcKey('*')" class="p-3.5 bg-brand-soft text-brand-dark rounded-2xl hover:bg-emerald-200">×</button>
 
-                <button onclick="calcKey('4')" class="p-3 bg-gray-50 font-semibold rounded-xl">4</button>
-                <button onclick="calcKey('5')" class="p-3 bg-gray-50 font-semibold rounded-xl">5</button>
-                <button onclick="calcKey('6')" class="p-3 bg-gray-50 font-semibold rounded-xl">6</button>
-                <button onclick="calcKey('-')" class="p-3 bg-brand-soft text-brand-dark font-bold rounded-xl">-</button>
+                <button onclick="calcKey('4')" class="p-3.5 bg-gray-50 text-brand-dark rounded-2xl hover:bg-gray-100">4</button>
+                <button onclick="calcKey('5')" class="p-3.5 bg-gray-50 text-brand-dark rounded-2xl hover:bg-gray-100">5</button>
+                <button onclick="calcKey('6')" class="p-3.5 bg-gray-50 text-brand-dark rounded-2xl hover:bg-gray-100">6</button>
+                <button onclick="calcKey('-')" class="p-3.5 bg-brand-soft text-brand-dark rounded-2xl hover:bg-emerald-200">-</button>
 
-                <button onclick="calcKey('1')" class="p-3 bg-gray-50 font-semibold rounded-xl">1</button>
-                <button onclick="calcKey('2')" class="p-3 bg-gray-50 font-semibold rounded-xl">2</button>
-                <button onclick="calcKey('3')" class="p-3 bg-gray-50 font-semibold rounded-xl">3</button>
-                <button onclick="calcKey('+')" class="p-3 bg-brand-soft text-brand-dark font-bold rounded-xl">+</button>
+                <button onclick="calcKey('1')" class="p-3.5 bg-gray-50 text-brand-dark rounded-2xl hover:bg-gray-100">1</button>
+                <button onclick="calcKey('2')" class="p-3.5 bg-gray-50 text-brand-dark rounded-2xl hover:bg-gray-100">2</button>
+                <button onclick="calcKey('3')" class="p-3.5 bg-gray-50 text-brand-dark rounded-2xl hover:bg-gray-100">3</button>
+                <button onclick="calcKey('+')" class="p-3.5 bg-brand-soft text-brand-dark rounded-2xl hover:bg-emerald-200">+</button>
 
-                <button onclick="calcKey('0')" class="p-3 bg-gray-50 font-semibold rounded-xl">0</button>
-                <button onclick="calcKey('.')" class="p-3 bg-gray-50 font-semibold rounded-xl">.</button>
-                <button onclick="calcKey('00')" class="p-3 bg-gray-50 font-semibold rounded-xl">00</button>
-                <button onclick="calcKey('=')" class="p-3 bg-brand-primary text-white font-bold rounded-xl shadow">=</button>
+                <button onclick="calcKey('0')" class="p-3.5 bg-gray-50 text-brand-dark rounded-2xl hover:bg-gray-100">0</button>
+                <button onclick="calcKey('.')" class="p-3.5 bg-gray-50 text-brand-dark rounded-2xl hover:bg-gray-100">.</button>
+                <button onclick="calcKey('00')" class="p-3.5 bg-gray-50 text-brand-dark rounded-2xl hover:bg-gray-100">00</button>
+                <button onclick="calcKey('=')" class="p-3.5 bg-brand-primary text-white font-black rounded-2xl shadow-lg hover:bg-brand-dark">=</button>
             </div>
         </div>
     </div>
 
     <!-- SETTINGS MODAL -->
-    <div id="modal-settings" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 hidden">
-        <div class="bg-white w-full max-w-sm rounded-2xl p-5 shadow-xl space-y-4">
+    <div id="modal-settings" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white w-full max-w-sm rounded-3xl p-5 shadow-2xl space-y-4 border border-emerald-900/10">
             <div class="flex justify-between items-center border-b pb-2">
-                <h3 class="font-bold text-gray-800"><i class="fa-solid fa-gear text-brand-primary mr-1"></i> 학습 환경 설정</h3>
-                <button onclick="toggleSettingsModal()" class="text-gray-400 hover:text-gray-600">&times;</button>
+                <h3 class="font-black text-base text-brand-dark"><i class="fa-solid fa-gear text-brand-primary mr-1.5"></i> 학습 환경 및 동기화</h3>
+                <button onclick="toggleSettingsModal()" class="text-gray-400 hover:text-gray-600 text-xl font-bold">&times;</button>
             </div>
-            <div class="space-y-3 text-sm">
+            <div class="space-y-3.5 text-sm">
                 <div>
-                    <label class="block text-xs font-semibold text-gray-600 mb-1">일일 목표 문제 수</label>
-                    <input type="number" id="setting-daily-goal" min="5" max="100" class="w-full bg-gray-100 border border-gray-200 rounded-xl p-2 text-sm font-bold text-brand-dark">
+                    <label class="block text-xs font-bold text-brand-muted mb-1">일일 목표 문제 수</label>
+                    <input type="number" id="setting-daily-goal" min="5" max="100" class="w-full bg-brand-bg border border-emerald-900/10 rounded-2xl p-2.5 text-sm font-black text-brand-dark">
                 </div>
-                <div class="pt-2 border-t space-y-2">
-                    <p class="text-xs text-gray-500 font-bold">데이터 백업 & 업그레이드</p>
-                    <div class="grid grid-cols-2 gap-2">
-                        <button onclick="exportDataJSON()" class="bg-brand-soft text-brand-dark font-bold py-2 rounded-xl text-xs hover:bg-brand-light transition">
+                <div class="pt-2 border-t border-gray-100 space-y-2">
+                    <p class="text-xs font-black text-brand-dark">💡 다른 브라우저/기기로 문제 가져오기</p>
+                    <p class="text-[11px] text-brand-muted leading-tight">내 문제 및 학습 기록을 JSON 파일로 저장하여 다른 기기에서 불러올 수 있습니다.</p>
+                    <div class="grid grid-cols-2 gap-2 pt-1">
+                        <button onclick="exportDataJSON()" class="bg-brand-soft text-brand-dark font-black py-2.5 rounded-2xl text-xs hover:bg-emerald-200 transition">
                             <i class="fa-solid fa-download mr-1"></i> JSON 내보내기
                         </button>
-                        <button onclick="document.getElementById('import-file-input').click()" class="bg-brand-soft text-brand-dark font-bold py-2 rounded-xl text-xs hover:bg-brand-light transition">
+                        <button onclick="document.getElementById('import-file-input').click()" class="bg-brand-soft text-brand-dark font-black py-2.5 rounded-2xl text-xs hover:bg-emerald-200 transition">
                             <i class="fa-solid fa-upload mr-1"></i> JSON 불러오기
                         </button>
                     </div>
                     <input type="file" id="import-file-input" class="hidden" accept=".json" onchange="importDataJSON(event)">
                 </div>
-                <div class="pt-2 border-t">
-                    <p class="text-xs text-gray-500 mb-2">학습 기록 및 오답 데이터 관리</p>
-                    <button onclick="resetAllData()" class="w-full bg-red-50 text-red-600 border border-red-200 py-2.5 rounded-xl font-bold text-xs hover:bg-red-100 transition">
+                <div class="pt-2 border-t border-gray-100">
+                    <button onclick="resetAllData()" class="w-full bg-red-50 text-red-600 border border-red-200 py-2.5 rounded-2xl font-black text-xs hover:bg-red-100 transition">
                         <i class="fa-solid fa-trash-can mr-1"></i> 모든 학습 데이터 초기화
                     </button>
                 </div>
             </div>
-            <button onclick="saveSettings()" class="w-full bg-brand-primary text-white font-bold py-2.5 rounded-xl text-sm shadow hover:bg-brand-dark transition">
+            <button onclick="saveSettings()" class="w-full bg-brand-primary text-white font-black py-3 rounded-2xl text-sm shadow-lg hover:bg-brand-dark transition">
                 저장 및 닫기
             </button>
         </div>
     </div>
 
     <!-- TOAST NOTIFICATION -->
-    <div id="toast" class="fixed top-16 left-1/2 -translate-x-1/2 bg-brand-dark text-white px-4 py-2 rounded-xl text-xs shadow-lg transition-opacity duration-300 opacity-0 pointer-events-none z-50 flex items-center space-x-2">
-        <i class="fa-solid fa-circle-check text-brand-light"></i>
+    <div id="toast" class="fixed top-16 left-1/2 -translate-x-1/2 bg-brand-dark text-white px-4 py-2.5 rounded-2xl text-xs font-bold shadow-2xl transition-opacity duration-300 opacity-0 pointer-events-none z-50 flex items-center space-x-2 border border-emerald-700/50">
+        <i class="fa-solid fa-circle-check text-brand-gold"></i>
         <span id="toast-msg">메시지 내용</span>
     </div>
 
@@ -481,9 +509,7 @@
            1. DATA STRUCTURES & OFFICIAL EXAM DATABASE (EXACT STANDARDS)
            ========================================================================== */
 
-        // CORE FORMULA DICTIONARY
         const DEFAULT_FORMULA_DB = [
-            // 수익성 지표
             {
                 id: 'f_roe',
                 cat: '수익성',
@@ -536,16 +562,14 @@
                 note: '영업외 손익을 제외하므로 기업 고유의 수익력 판단에 최적.',
                 ex: '매출액 400억원, 영업이익 40억원 ➔ 40 ÷ 400 × 100 = 10.0%'
             },
-            
-            // 안정성 지표
             {
                 id: 'f_debt_ratio',
                 cat: '안정성',
                 name: '부채비율',
                 formula: '타인자본(총부채) ÷ 자기자본 × 100',
                 num: '총부채 (유동부채 + 비유동부채)',
-                den: '자기자본 (자본금 + 자본전입금 + 이익잉여금 등)',
-                meaning: '기업의 타인자본 의존도를 측정하는 대표적인 재무건전성 지표',
+                den: '자기자본 (자본금 + 이익잉여금 등)',
+                meaning: '기업의 타인자본 의존도를 측정하는 대표 재무건전성 지표',
                 highMeaning: '채권자에 대한 위험도가 높고 재무적 리스크 증가',
                 lowMeaning: '재무구조가 건전하지만 레버리지 효과 활용 부족 가능성',
                 note: '일반적으로 100% 이하를 이상적으로 보나 업종별 차이 존재.',
@@ -590,8 +614,6 @@
                 note: '신용평가 시 한계기업 판정의 핵심 기준 (3년 연속 1.0 미만 시 부실징후).',
                 ex: '영업이익 50억원, 이자비용 10억원 ➔ 이자보상배율 = 50 ÷ 10 = 5.0배'
             },
-
-            // 활동성 지표
             {
                 id: 'f_asset_turnover',
                 cat: '활동성',
@@ -618,11 +640,9 @@
                 note: '평균회수기간 = 365일 ÷ 매출채권회전율',
                 ex: '매출액 600억원, 평균매출채권 100억원 ➔ 회전율 = 6.0회 (회수기간 = 365/6 = 60.8일)'
             },
-
-            // 현금흐름 및 가치 지표
             {
                 id: 'f_ebitda',
-                cat: '현금흐름 및 가치',
+                cat: '현금흐름',
                 name: 'EBITDA',
                 formula: '영업이익 + 감가상각비 + 무형자산상각비',
                 num: '영업이익 + 유형자산감가상각비 + 무형자산상각비',
@@ -635,7 +655,7 @@
             },
             {
                 id: 'f_fcf',
-                cat: '현금흐름 및 가치',
+                cat: '현금흐름',
                 name: '잉여현금흐름 (FCF)',
                 formula: '영업활동현금흐름 - 자본적지출(CAPEX)',
                 num: '영업현금흐름 - 유형자산 취득액',
@@ -648,7 +668,6 @@
             }
         ];
 
-        // FULL QUESTION BANK (Part 1, Part 2, Advanced Multi-step Dupont & FCF Included)
         const DEFAULT_QUESTION_BANK = [
             {
                 id: 'q1',
@@ -759,17 +778,17 @@
            2. APP STATE & LOCAL STORAGE MANAGERS
            ========================================================================== */
 
-        const STORAGE_KEY = 'CREDIT_ANALYST_APP_STATE_V2';
+        const STORAGE_KEY = 'CREDIT_ANALYST_APP_STATE_V3';
 
         let appState = {
             todaySolvedCount: 0,
             lastDateStr: new Date().toISOString().slice(0, 10),
             dailyGoal: 20,
-            solvedLogs: [], // { questionId, isCorrect, userAns, timestamp }
-            masteredFormulas: [], // array of formulaId
-            wrongQuestions: [], // array of { questionId, wrongCount, lastWrongDate }
-            customFormulas: [], // User created custom formulas
-            customQuestions: [] // User created custom questions
+            solvedLogs: [],
+            masteredFormulas: [],
+            wrongQuestions: [],
+            customFormulas: [],
+            customQuestions: []
         };
 
         function loadState() {
@@ -791,7 +810,6 @@
             
             FORMULA_DB = [...DEFAULT_FORMULA_DB, ...(appState.customFormulas || [])];
             QUESTION_BANK = [...DEFAULT_QUESTION_BANK, ...(appState.customQuestions || [])];
-            saveState();
         }
 
         function saveState() {
@@ -801,16 +819,16 @@
 
         function exportDataJSON() {
             const exportObj = {
-                version: '2.0',
+                version: '3.0',
                 appState: appState,
                 exportDate: new Date().toISOString()
             };
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportObj, null, 2));
             const dlAnchorElem = document.createElement('a');
             dlAnchorElem.setAttribute("href", dataStr);
-            dlAnchorElem.setAttribute("download", `CreditAnalyst_Backup_${new Date().toISOString().slice(0,10)}.json`);
+            dlAnchorElem.setAttribute("download", `CreditAnalyst_Data_${new Date().toISOString().slice(0,10)}.json`);
             dlAnchorElem.click();
-            showToast('데이터가 JSON으로 백업되었습니다!');
+            showToast('데이터가 JSON 파일로 다운로드되었습니다!');
         }
 
         function importDataJSON(event) {
@@ -822,10 +840,10 @@
                         appState = imported.appState;
                         saveState();
                         loadState();
-                        showToast('데이터 불러오기 완료!');
+                        showToast('데이터 불러오기 성공!');
                         navTo('dashboard');
                     } else {
-                        showToast('올바르지 않은 JSON 데이터 형식입니다.');
+                        showToast('올바르지 않은 JSON 파일입니다.');
                     }
                 } catch (err) {
                     showToast('JSON 파일을 읽는 중 오류가 발생했습니다.');
@@ -913,6 +931,18 @@
             document.getElementById('part2-progress-bar').style.width = p2Pct + '%';
         }
 
+        function renderFractionHTML(num, den) {
+            if (!den || den === 'N/A' || den.trim() === '') {
+                return `<span class="font-extrabold text-brand-gold">${num}</span>`;
+            }
+            return `
+                <div class="fraction-box font-extrabold inline-block align-middle my-1">
+                    <div class="fraction-numerator text-brand-gold border-brand-gold">${num}</div>
+                    <div class="fraction-denominator text-emerald-100">${den}</div>
+                </div>
+            `;
+        }
+
         /* ==========================================================================
            4. MODULE RENDERING LOGIC
            ========================================================================== */
@@ -957,26 +987,14 @@
             }
         }
 
-        function renderFractionHTML(num, den) {
-            if (!den || den === 'N/A' || den.trim() === '') {
-                return `<span class="font-bold text-brand-dark">${num}</span>`;
-            }
-            return `
-                <div class="fraction-box text-xs md:text-sm font-bold text-brand-dark inline-block align-middle my-1">
-                    <div class="fraction-numerator text-brand-primary border-brand-primary">${num}</div>
-                    <div class="fraction-denominator text-brand-dark">${den}</div>
-                </div>
-            `;
-        }
-
         /* MODULE 1 */
         function renderTodayModule(container) {
             container.innerHTML = `
                 <div class="space-y-4">
-                    <div class="bg-white rounded-2xl p-4 shadow-sm border border-amber-100">
-                        <span class="text-xs font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded">맞춤 복습</span>
-                        <h3 class="font-bold text-base text-gray-800 mt-1">오늘의 추천 문제</h3>
-                        <p class="text-xs text-gray-500">취약한 개념과 출제 비중이 높은 핵심 계산 문제입니다.</p>
+                    <div class="bg-white rounded-3xl p-4.5 glass-shadow border border-amber-100 space-y-1">
+                        <span class="text-[10px] font-black text-amber-700 bg-amber-100 px-2 py-0.5 rounded-full uppercase">맞춤 복습</span>
+                        <h3 class="font-black text-base text-brand-dark">오늘의 추천 핵심 문제</h3>
+                        <p class="text-xs text-brand-muted">출제 빈도가 가장 높은 재무비율 및 신용평가 문제 모음입니다.</p>
                     </div>
                     <div id="today-quiz-list" class="space-y-4"></div>
                 </div>
@@ -995,12 +1013,12 @@
             const filteredQuestions = QUESTION_BANK.filter(q => q.part === partNum);
             container.innerHTML = `
                 <div class="space-y-4">
-                    <div class="bg-white rounded-2xl p-4 shadow-sm border border-emerald-100 flex justify-between items-center">
+                    <div class="bg-white rounded-3xl p-4.5 glass-shadow border border-emerald-900/10 flex justify-between items-center">
                         <div>
-                            <h3 class="font-bold text-base text-gray-800">신용분석사 ${partNum}부 출제 범위</h3>
-                            <p class="text-xs text-gray-500">총 ${filteredQuestions.length}개의 핵심 검증 문제 보유</p>
+                            <h3 class="font-black text-base text-brand-dark">신용분석사 ${partNum}부 실전 문제</h3>
+                            <p class="text-xs text-brand-muted">총 ${filteredQuestions.length}개의 엄선된 출제 문제</p>
                         </div>
-                        <span class="text-sm font-extrabold text-brand-primary bg-brand-soft px-3 py-1 rounded-xl">${partNum}부</span>
+                        <span class="text-sm font-black text-brand-primary bg-brand-soft px-3.5 py-1.5 rounded-2xl">${partNum}부</span>
                     </div>
                     <div id="part-quiz-list" class="space-y-4"></div>
                 </div>
@@ -1014,56 +1032,62 @@
             });
         }
 
-        /* MODULE 4: FLASHCARDS */
-        let flashcardIndex = 0;
-        let isCardFlipped = false;
+        /* MODULE 4: FLASHCARDS (ROBUST FLIP CARD MODULE) */
+        let fcIndex = 0;
 
         function renderFlashcardModule(container) {
-            const currentFormula = FORMULA_DB[flashcardIndex];
+            if (!FORMULA_DB || FORMULA_DB.length === 0) {
+                container.innerHTML = '<p class="text-center text-xs py-8 text-brand-muted">등록된 공식이 없습니다.</p>';
+                return;
+            }
+
+            const currentFormula = FORMULA_DB[fcIndex % FORMULA_DB.length];
 
             container.innerHTML = `
                 <div class="space-y-4">
-                    <div class="flex justify-between items-center bg-white p-3 rounded-xl shadow-sm">
-                        <span class="text-xs font-bold text-gray-600">카테고리: <span class="text-brand-primary">${currentFormula.cat}</span></span>
-                        <span class="text-xs font-bold text-brand-muted">${flashcardIndex + 1} / ${FORMULA_DB.length}</span>
+                    <div class="flex justify-between items-center bg-white px-4 py-3 rounded-2xl glass-shadow border border-emerald-900/5">
+                        <span class="text-xs font-bold text-brand-dark">분류: <span class="text-brand-primary">${currentFormula.cat}</span></span>
+                        <span class="text-xs font-black text-brand-gold bg-brand-dark px-2.5 py-0.5 rounded-full">${fcIndex + 1} / ${FORMULA_DB.length}</span>
                     </div>
 
-                    <div class="perspective-1000 w-full h-84 cursor-pointer" onclick="flipFlashcard()">
-                        <div id="flashcard-inner" class="relative w-full h-full duration-500 transform-style-3d bg-white rounded-2xl shadow-md border-2 border-brand-primary p-5 flex flex-col justify-between transition-transform">
+                    <div class="card-container w-full h-80 cursor-pointer" onclick="toggleCardFlip()">
+                        <div id="flashcard-inner-box" class="card-inner">
                             
-                            <div class="absolute inset-0 p-5 flex flex-col justify-between backface-hidden bg-white rounded-2xl">
+                            <!-- Front Side -->
+                            <div class="card-front bg-white border-2 border-brand-primary/20 p-6 flex flex-col justify-between shadow-xl">
                                 <div class="flex justify-between items-center">
-                                    <span class="text-xs font-bold px-2 py-1 bg-brand-soft text-brand-dark rounded-md">${currentFormula.cat}</span>
-                                    <span class="text-xs text-gray-400"><i class="fa-solid fa-rotate mr-1"></i>터치하여 산식 확인</span>
+                                    <span class="text-xs font-bold px-2.5 py-1 bg-brand-soft text-brand-dark rounded-lg">${currentFormula.cat}</span>
+                                    <span class="text-xs font-bold text-brand-muted"><i class="fa-solid fa-rotate text-brand-primary mr-1"></i>터치하여 수식 정답 확인</span>
                                 </div>
                                 <div class="text-center my-auto space-y-2">
-                                    <h3 class="text-2xl font-extrabold text-brand-dark">${currentFormula.name}</h3>
-                                    <p class="text-xs text-gray-500">이 공식의 정확한 분자, 분모 및 계산법은?</p>
+                                    <h3 class="text-2xl font-black text-brand-dark tracking-tight">${currentFormula.name}</h3>
+                                    <p class="text-xs font-medium text-brand-muted">이 지표의 정확한 산식(분자/분모)과 의미는?</p>
                                 </div>
                                 <div class="text-center">
-                                    <span class="text-xs font-bold text-brand-primary border border-brand-primary px-3 py-1.5 rounded-xl">정답 확인하기</span>
+                                    <span class="text-xs font-bold text-brand-primary border border-brand-primary/30 px-4 py-2 rounded-2xl bg-brand-soft/50">카드 뒤집기</span>
                                 </div>
                             </div>
 
-                            <div class="absolute inset-0 p-5 flex flex-col justify-between backface-hidden rotate-y-180 bg-brand-dark text-white rounded-2xl overflow-y-auto no-scrollbar">
-                                <div class="flex justify-between items-center border-b border-gray-700 pb-2">
-                                    <span class="text-xs font-bold text-brand-soft">${currentFormula.name}</span>
-                                    <span class="text-xs text-gray-400">공식 해설</span>
+                            <!-- Back Side -->
+                            <div class="card-back bg-gradient-to-br from-brand-dark to-emerald-950 text-white p-6 flex flex-col justify-between shadow-2xl overflow-y-auto no-scrollbar border border-emerald-700/30">
+                                <div class="flex justify-between items-center border-b border-emerald-800/60 pb-2">
+                                    <span class="text-xs font-black text-brand-gold">${currentFormula.name}</span>
+                                    <span class="text-[11px] text-emerald-200">정확한 공식 및 해설</span>
                                 </div>
                                 <div class="my-auto space-y-3 text-left py-2">
-                                    <div class="bg-white/10 p-2.5 rounded-xl text-center">
-                                        <span class="text-[10px] text-brand-light font-bold block uppercase mb-1">시각적 산식 수식</span>
+                                    <div class="bg-black/30 p-3 rounded-2xl text-center border border-white/10">
+                                        <span class="text-[10px] text-emerald-300 font-bold block uppercase mb-1">시각적 분수 공식</span>
                                         <div class="text-white">
                                             ${renderFractionHTML(currentFormula.num, currentFormula.den)}
                                         </div>
                                     </div>
-                                    <div class="text-xs bg-black/20 p-2 rounded-lg">
-                                        <span class="text-brand-accent font-bold">의미 & 주의사항:</span> ${currentFormula.meaning} <br>
-                                        <span class="text-gray-300">${currentFormula.note}</span>
+                                    <div class="text-xs bg-white/5 p-3 rounded-xl border border-white/5 space-y-1">
+                                        <p><span class="text-brand-gold font-bold">의미:</span> ${currentFormula.meaning}</p>
+                                        <p class="text-emerald-200/80 text-[11px]"><strong>주의사항:</strong> ${currentFormula.note}</p>
                                     </div>
                                 </div>
                                 <div class="text-center pt-2">
-                                    <span class="text-xs text-gray-400">카드를 다시 누르면 앞면으로 전환</span>
+                                    <span class="text-[11px] text-emerald-300 font-semibold">카드를 다시 터치하면 앞면으로 이동합니다</span>
                                 </div>
                             </div>
 
@@ -1071,49 +1095,42 @@
                     </div>
 
                     <div class="grid grid-cols-2 gap-3">
-                        <button onclick="markFormulaStatus('${currentFormula.id}', false)" class="bg-red-50 text-red-600 border border-red-200 p-3 rounded-xl font-bold text-sm shadow-sm hover:bg-red-100 transition flex items-center justify-center space-x-1">
-                            <i class="fa-solid fa-xmark"></i>
+                        <button onclick="markFormulaStatus('${currentFormula.id}', false)" class="bg-white text-red-600 border border-red-200 p-3.5 rounded-2xl font-black text-xs shadow-sm hover:bg-red-50 transition flex items-center justify-center space-x-1.5 active:scale-95">
+                            <i class="fa-solid fa-xmark text-sm"></i>
                             <span>아직 모름 (복습)</span>
                         </button>
-                        <button onclick="markFormulaStatus('${currentFormula.id}', true)" class="bg-brand-primary text-white p-3 rounded-xl font-bold text-sm shadow-sm hover:bg-brand-dark transition flex items-center justify-center space-x-1">
-                            <i class="fa-solid fa-check"></i>
+                        <button onclick="markFormulaStatus('${currentFormula.id}', true)" class="bg-brand-primary text-white p-3.5 rounded-2xl font-black text-xs shadow-md hover:bg-brand-dark transition flex items-center justify-center space-x-1.5 active:scale-95 border border-emerald-700/30">
+                            <i class="fa-solid fa-check text-sm text-brand-gold"></i>
                             <span>알고 있음 (완료)</span>
                         </button>
                     </div>
 
-                    <div class="flex justify-between items-center pt-2">
-                        <button onclick="prevFlashcard()" class="text-xs font-bold text-gray-600 bg-white px-3 py-2 rounded-xl border shadow-sm">
-                            <i class="fa-solid fa-chevron-left mr-1"></i> 이전 카드
+                    <div class="flex justify-between items-center pt-1">
+                        <button onclick="prevFlashcard()" class="text-xs font-bold text-brand-dark bg-white px-4 py-2.5 rounded-2xl border border-emerald-900/10 shadow-sm">
+                            <i class="fa-solid fa-chevron-left mr-1"></i> 이전 공식
                         </button>
-                        <button onclick="nextFlashcard()" class="text-xs font-bold text-gray-600 bg-white px-3 py-2 rounded-xl border shadow-sm">
-                            다음 카드 <i class="fa-solid fa-chevron-right ml-1"></i>
+                        <button onclick="nextFlashcard()" class="text-xs font-bold text-brand-dark bg-white px-4 py-2.5 rounded-2xl border border-emerald-900/10 shadow-sm">
+                            다음 공식 <i class="fa-solid fa-chevron-right ml-1"></i>
                         </button>
                     </div>
                 </div>
             `;
         }
 
-        function flipFlashcard() {
-            const inner = document.getElementById('flashcard-inner');
+        function toggleCardFlip() {
+            const inner = document.getElementById('flashcard-inner-box');
             if (inner) {
-                isCardFlipped = !isCardFlipped;
-                if (isCardFlipped) {
-                    inner.classList.add('rotate-y-180');
-                } else {
-                    inner.classList.remove('rotate-y-180');
-                }
+                inner.classList.toggle('flipped');
             }
         }
 
         function prevFlashcard() {
-            isCardFlipped = false;
-            flashcardIndex = (flashcardIndex - 1 + FORMULA_DB.length) % FORMULA_DB.length;
+            fcIndex = (fcIndex - 1 + FORMULA_DB.length) % FORMULA_DB.length;
             renderFlashcardModule(document.getElementById('view-module'));
         }
 
         function nextFlashcard() {
-            isCardFlipped = false;
-            flashcardIndex = (flashcardIndex + 1) % FORMULA_DB.length;
+            fcIndex = (fcIndex + 1) % FORMULA_DB.length;
             renderFlashcardModule(document.getElementById('view-module'));
         }
 
@@ -1122,7 +1139,7 @@
                 if (!appState.masteredFormulas.includes(fId)) {
                     appState.masteredFormulas.push(fId);
                 }
-                showToast('암기 완료 목록에 저장되었습니다.');
+                showToast('암기 완료 항목에 등록되었습니다!');
             } else {
                 appState.masteredFormulas = appState.masteredFormulas.filter(id => id !== fId);
                 showToast('복습 필요 항목으로 유지됩니다.');
@@ -1135,34 +1152,34 @@
         function renderAdminModule(container) {
             container.innerHTML = `
                 <div class="space-y-4">
-                    <div class="flex border-b border-gray-200 bg-white rounded-xl p-1 shadow-sm">
-                        <button onclick="switchAdminTab('q')" id="admin-tab-q" class="flex-1 py-2 text-xs font-bold text-center rounded-lg bg-brand-primary text-white">
+                    <div class="flex border-b border-gray-200 bg-white rounded-2xl p-1.5 shadow-sm border border-emerald-900/5">
+                        <button onclick="switchAdminTab('q')" id="admin-tab-q" class="flex-1 py-2 text-xs font-black text-center rounded-xl bg-brand-primary text-white">
                             문제 관리 (${QUESTION_BANK.length})
                         </button>
-                        <button onclick="switchAdminTab('f')" id="admin-tab-f" class="flex-1 py-2 text-xs font-bold text-center rounded-lg text-gray-500">
+                        <button onclick="switchAdminTab('f')" id="admin-tab-f" class="flex-1 py-2 text-xs font-black text-center rounded-xl text-brand-muted">
                             공식 사전 관리 (${FORMULA_DB.length})
                         </button>
                     </div>
 
                     <div id="admin-sec-q" class="space-y-3">
-                        <button onclick="toggleAddQuestionForm()" class="w-full bg-brand-primary text-white font-bold py-2.5 rounded-xl text-xs shadow flex items-center justify-center space-x-1">
-                            <i class="fa-solid fa-plus"></i>
-                            <span>새 신용분석사 문제 추가</span>
+                        <button onclick="toggleAddQuestionForm()" class="w-full bg-brand-primary text-white font-black py-3 rounded-2xl text-xs shadow-md flex items-center justify-center space-x-1 border border-emerald-700/30">
+                            <i class="fa-solid fa-plus text-brand-gold"></i>
+                            <span>새 신용분석사 문제 직접 추가</span>
                         </button>
                         
-                        <div id="form-add-q" class="hidden bg-white rounded-2xl p-4 shadow-sm border border-brand-primary space-y-3 text-xs">
-                            <h4 class="font-bold text-sm text-brand-dark">새 문제 등록</h4>
+                        <div id="form-add-q" class="hidden bg-white rounded-3xl p-5 shadow-xl border border-brand-primary/20 space-y-3.5 text-xs">
+                            <h4 class="font-black text-sm text-brand-dark border-b pb-2">새 문제 등록</h4>
                             <div class="grid grid-cols-2 gap-2">
                                 <div>
                                     <label class="block font-bold text-gray-600 mb-1">시험 파트</label>
-                                    <select id="new-q-part" class="w-full border p-2 rounded-lg bg-gray-50 font-bold">
+                                    <select id="new-q-part" class="w-full border p-2.5 rounded-xl bg-gray-50 font-bold text-brand-dark">
                                         <option value="1">1부</option>
                                         <option value="2">2부</option>
                                     </select>
                                 </div>
                                 <div>
                                     <label class="block font-bold text-gray-600 mb-1">난이도</label>
-                                    <select id="new-q-diff" class="w-full border p-2 rounded-lg bg-gray-50 font-bold">
+                                    <select id="new-q-diff" class="w-full border p-2.5 rounded-xl bg-gray-50 font-bold text-brand-dark">
                                         <option value="초급">초급</option>
                                         <option value="중급">중급</option>
                                         <option value="고급">고급</option>
@@ -1172,26 +1189,26 @@
                             </div>
                             <div>
                                 <label class="block font-bold text-gray-600 mb-1">과목명 / 단원</label>
-                                <input type="text" id="new-q-sub" placeholder="예: 재무제표 분석 / 듀퐁분석" class="w-full border p-2 rounded-lg">
+                                <input type="text" id="new-q-sub" placeholder="예: 재무제표 분석 / 듀퐁분석" class="w-full border p-2.5 rounded-xl">
                             </div>
                             <div>
                                 <label class="block font-bold text-gray-600 mb-1">문제 지문</label>
-                                <textarea id="new-q-text" rows="2" placeholder="문제 내용 입력" class="w-full border p-2 rounded-lg"></textarea>
+                                <textarea id="new-q-text" rows="2" placeholder="문제 내용을 입력하세요" class="w-full border p-2.5 rounded-xl"></textarea>
                             </div>
                             <div>
                                 <label class="block font-bold text-gray-600 mb-1">보기 (쉼표로 구분)</label>
-                                <input type="text" id="new-q-opts" placeholder="10%, 15%, 20%, 25%" class="w-full border p-2 rounded-lg">
+                                <input type="text" id="new-q-opts" placeholder="10%, 15%, 20%, 25%" class="w-full border p-2.5 rounded-xl">
                             </div>
                             <div>
-                                <label class="block font-bold text-gray-600 mb-1">정답 (보기 중 하나와 완전 일치)</label>
-                                <input type="text" id="new-q-ans" placeholder="예: 15%" class="w-full border p-2 rounded-lg">
+                                <label class="block font-bold text-gray-600 mb-1">정답 (보기 항목 중 하나와 완전 동일하게 작성)</label>
+                                <input type="text" id="new-q-ans" placeholder="예: 15%" class="w-full border p-2.5 rounded-xl font-bold text-brand-primary">
                             </div>
                             <div>
                                 <label class="block font-bold text-gray-600 mb-1">해설 및 풀이과정</label>
-                                <textarea id="new-q-exp" rows="2" placeholder="상세 해설" class="w-full border p-2 rounded-lg"></textarea>
+                                <textarea id="new-q-exp" rows="2" placeholder="풀이 과정을 상세히 입력하세요" class="w-full border p-2.5 rounded-xl"></textarea>
                             </div>
-                            <button onclick="saveNewQuestion()" class="w-full bg-brand-primary text-white font-bold py-2 rounded-lg">
-                                저장 완료
+                            <button onclick="saveNewQuestion()" class="w-full bg-brand-primary text-white font-black py-3 rounded-2xl shadow-lg">
+                                문제 등록 완료
                             </button>
                         </div>
 
@@ -1199,41 +1216,41 @@
                     </div>
 
                     <div id="admin-sec-f" class="hidden space-y-3">
-                        <button onclick="toggleAddFormulaForm()" class="w-full bg-brand-primary text-white font-bold py-2.5 rounded-xl text-xs shadow flex items-center justify-center space-x-1">
-                            <i class="fa-solid fa-plus"></i>
-                            <span>새 공식 지표 추가</span>
+                        <button onclick="toggleAddFormulaForm()" class="w-full bg-brand-primary text-white font-black py-3 rounded-2xl text-xs shadow-md flex items-center justify-center space-x-1 border border-emerald-700/30">
+                            <i class="fa-solid fa-plus text-brand-gold"></i>
+                            <span>새 공식 지표 직접 추가</span>
                         </button>
 
-                        <div id="form-add-f" class="hidden bg-white rounded-2xl p-4 shadow-sm border border-brand-primary space-y-3 text-xs">
-                            <h4 class="font-bold text-sm text-brand-dark">새 공식 등록</h4>
+                        <div id="form-add-f" class="hidden bg-white rounded-3xl p-5 shadow-xl border border-brand-primary/20 space-y-3.5 text-xs">
+                            <h4 class="font-black text-sm text-brand-dark border-b pb-2">새 공식 등록</h4>
                             <div>
                                 <label class="block font-bold text-gray-600 mb-1">카테고리</label>
-                                <input type="text" id="new-f-cat" placeholder="예: 수익성, 안정성, 현금흐름" class="w-full border p-2 rounded-lg">
+                                <input type="text" id="new-f-cat" placeholder="예: 수익성, 안정성, 현금흐름" class="w-full border p-2.5 rounded-xl">
                             </div>
                             <div>
                                 <label class="block font-bold text-gray-600 mb-1">공식 명칭</label>
-                                <input type="text" id="new-f-name" placeholder="예: 듀퐁 ROE" class="w-full border p-2 rounded-lg">
+                                <input type="text" id="new-f-name" placeholder="예: 듀퐁 ROE" class="w-full border p-2.5 rounded-xl">
                             </div>
                             <div class="grid grid-cols-2 gap-2">
                                 <div>
                                     <label class="block font-bold text-gray-600 mb-1">분자 (Numerator)</label>
-                                    <input type="text" id="new-f-num" placeholder="예: 당기순이익" class="w-full border p-2 rounded-lg">
+                                    <input type="text" id="new-f-num" placeholder="예: 당기순이익" class="w-full border p-2.5 rounded-xl">
                                 </div>
                                 <div>
                                     <label class="block font-bold text-gray-600 mb-1">분모 (Denominator)</label>
-                                    <input type="text" id="new-f-den" placeholder="예: 자기자본" class="w-full border p-2 rounded-lg">
+                                    <input type="text" id="new-f-den" placeholder="예: 자기자본" class="w-full border p-2.5 rounded-xl">
                                 </div>
                             </div>
                             <div>
-                                <label class="block font-bold text-gray-600 mb-1">공식 텍스트 표현</label>
-                                <input type="text" id="new-f-text" placeholder="예: 당기순이익 ÷ 자기자본 × 100" class="w-full border p-2 rounded-lg">
+                                <label class="block font-bold text-gray-600 mb-1">공식 산식 텍스트</label>
+                                <input type="text" id="new-f-text" placeholder="예: 당기순이익 ÷ 자기자본 × 100" class="w-full border p-2.5 rounded-xl font-bold">
                             </div>
                             <div>
-                                <label class="block font-bold text-gray-600 mb-1">지표 의미 및 설명</label>
-                                <textarea id="new-f-meaning" rows="2" placeholder="의미 설명" class="w-full border p-2 rounded-lg"></textarea>
+                                <label class="block font-bold text-gray-600 mb-1">지표 의미 설명</label>
+                                <textarea id="new-f-meaning" rows="2" placeholder="의미 및 주의사항 설명" class="w-full border p-2.5 rounded-xl"></textarea>
                             </div>
-                            <button onclick="saveNewFormula()" class="w-full bg-brand-primary text-white font-bold py-2 rounded-lg">
-                                공식 저장 완료
+                            <button onclick="saveNewFormula()" class="w-full bg-brand-primary text-white font-black py-3 rounded-2xl shadow-lg">
+                                공식 등록 완료
                             </button>
                         </div>
 
@@ -1249,13 +1266,13 @@
             if (tab === 'q') {
                 document.getElementById('admin-sec-q').classList.remove('hidden');
                 document.getElementById('admin-sec-f').classList.add('hidden');
-                document.getElementById('admin-tab-q').className = "flex-1 py-2 text-xs font-bold text-center rounded-lg bg-brand-primary text-white";
-                document.getElementById('admin-tab-f').className = "flex-1 py-2 text-xs font-bold text-center rounded-lg text-gray-500";
+                document.getElementById('admin-tab-q').className = "flex-1 py-2 text-xs font-black text-center rounded-xl bg-brand-primary text-white";
+                document.getElementById('admin-tab-f').className = "flex-1 py-2 text-xs font-black text-center rounded-xl text-brand-muted";
             } else {
                 document.getElementById('admin-sec-q').classList.add('hidden');
                 document.getElementById('admin-sec-f').classList.remove('hidden');
-                document.getElementById('admin-tab-f').className = "flex-1 py-2 text-xs font-bold text-center rounded-lg bg-brand-primary text-white";
-                document.getElementById('admin-tab-q').className = "flex-1 py-2 text-xs font-bold text-center rounded-lg text-gray-500";
+                document.getElementById('admin-tab-f').className = "flex-1 py-2 text-xs font-black text-center rounded-xl bg-brand-primary text-white";
+                document.getElementById('admin-tab-q').className = "flex-1 py-2 text-xs font-black text-center rounded-xl text-brand-muted";
             }
         }
 
@@ -1270,7 +1287,7 @@
         function saveNewQuestion() {
             const part = parseInt(document.getElementById('new-q-part').value);
             const diff = document.getElementById('new-q-diff').value;
-            const sub = document.getElementById('new-q-sub').value || '자유 수강';
+            const sub = document.getElementById('new-q-sub').value || '사용자 과목';
             const text = document.getElementById('new-q-text').value;
             const optsRaw = document.getElementById('new-q-opts').value;
             const ans = document.getElementById('new-q-ans').value;
@@ -1300,7 +1317,7 @@
             appState.customQuestions.push(newQ);
             saveState();
             loadState();
-            showToast('새 문제가 성공적으로 추가되었습니다!');
+            showToast('새 문제가 등록되었습니다! [설정-JSON 내보내기]로 다른 기기 공유 가능');
             renderAdminModule(document.getElementById('view-module'));
         }
 
@@ -1335,7 +1352,7 @@
             appState.customFormulas.push(newF);
             saveState();
             loadState();
-            showToast('새 공식이 성공적으로 추가되었습니다!');
+            showToast('새 공식이 성공적으로 등록되었습니다!');
             renderAdminModule(document.getElementById('view-module'));
         }
 
@@ -1367,17 +1384,17 @@
             QUESTION_BANK.forEach(q => {
                 const isCustom = q.id.startsWith('custom_q_');
                 const item = document.createElement('div');
-                item.className = 'bg-white p-3 rounded-xl border border-gray-100 flex justify-between items-center text-xs';
+                item.className = 'bg-white p-3 rounded-2xl border border-gray-100 flex justify-between items-center text-xs shadow-sm';
                 item.innerHTML = `
                     <div class="space-y-0.5 flex-1 pr-2">
                         <span class="font-bold text-brand-primary">[${q.part}부] ${q.subject}</span>
-                        <p class="font-semibold text-gray-800 line-clamp-1">${q.question}</p>
+                        <p class="font-semibold text-brand-dark line-clamp-1">${q.question}</p>
                     </div>
                     ${isCustom ? `
-                        <button onclick="deleteQuestion('${q.id}')" class="text-red-500 hover:text-red-700 font-bold px-2 py-1 bg-red-50 rounded-lg">
+                        <button onclick="deleteQuestion('${q.id}')" class="text-red-500 hover:text-red-700 font-bold px-2.5 py-1 bg-red-50 rounded-xl border border-red-100">
                             삭제
                         </button>
-                    ` : '<span class="text-[10px] text-gray-400 bg-gray-100 px-2 py-0.5 rounded">기본</span>'}
+                    ` : '<span class="text-[10px] font-bold text-brand-muted bg-gray-100 px-2 py-0.5 rounded-lg">기본</span>'}
                 `;
                 container.appendChild(item);
             });
@@ -1391,17 +1408,17 @@
             FORMULA_DB.forEach(f => {
                 const isCustom = f.id.startsWith('custom_f_');
                 const item = document.createElement('div');
-                item.className = 'bg-white p-3 rounded-xl border border-gray-100 flex justify-between items-center text-xs';
+                item.className = 'bg-white p-3 rounded-2xl border border-gray-100 flex justify-between items-center text-xs shadow-sm';
                 item.innerHTML = `
                     <div class="space-y-0.5 flex-1 pr-2">
                         <span class="font-bold text-brand-dark">${f.name}</span>
-                        <p class="text-gray-500 text-[11px] font-mono">${f.formula}</p>
+                        <p class="text-brand-muted text-[11px] font-mono">${f.formula}</p>
                     </div>
                     ${isCustom ? `
-                        <button onclick="deleteFormula('${f.id}')" class="text-red-500 hover:text-red-700 font-bold px-2 py-1 bg-red-50 rounded-lg">
+                        <button onclick="deleteFormula('${f.id}')" class="text-red-500 hover:text-red-700 font-bold px-2.5 py-1 bg-red-50 rounded-xl border border-red-100">
                             삭제
                         </button>
-                    ` : '<span class="text-[10px] text-gray-400 bg-gray-100 px-2 py-0.5 rounded">기본</span>'}
+                    ` : '<span class="text-[10px] font-bold text-brand-muted bg-gray-100 px-2 py-0.5 rounded-lg">기본</span>'}
                 `;
                 container.appendChild(item);
             });
@@ -1416,18 +1433,18 @@
             const formulaObj = FORMULA_DB.find(f => f.id === currentQ.formulaId) || FORMULA_DB[0];
 
             container.innerHTML = `
-                <div class="bg-white rounded-2xl p-4 shadow-sm space-y-4">
+                <div class="bg-white rounded-3xl p-5 glass-shadow space-y-4 border border-emerald-900/5">
                     <div class="border-b pb-2 flex justify-between items-center">
-                        <span class="text-xs font-bold text-brand-primary bg-brand-soft px-2.5 py-1 rounded-full">단계별 실전 계산</span>
-                        <span class="text-xs text-gray-400">${calcPracticeIndex + 1} / ${calcQuestions.length}</span>
+                        <span class="text-xs font-black text-brand-primary bg-brand-soft px-3 py-1 rounded-full">단계별 실전 계산</span>
+                        <span class="text-xs font-bold text-brand-muted">${calcPracticeIndex + 1} / ${calcQuestions.length}</span>
                     </div>
 
                     <div>
-                        <h3 class="font-bold text-base text-gray-800 mb-1">${currentQ.question}</h3>
-                        <p class="text-xs text-gray-500">공식을 상기하여 숫자를 대입하고 최종 답을 도출하세요.</p>
+                        <h3 class="font-black text-base text-brand-dark mb-1">${currentQ.question}</h3>
+                        <p class="text-xs text-brand-muted">공식을 상기하여 숫자를 대입하고 최종 답을 도출하세요.</p>
                     </div>
 
-                    <div class="bg-brand-bg p-3 rounded-xl border border-gray-200 text-xs space-y-1">
+                    <div class="bg-brand-bg p-3.5 rounded-2xl border border-emerald-900/10 text-xs space-y-1">
                         <span class="font-bold text-brand-dark block"><i class="fa-solid fa-list-ol text-brand-primary mr-1"></i>STEP 1. 필수 공식 확인</span>
                         <p class="font-mono text-brand-primary font-bold text-sm">${formulaObj.name}: ${formulaObj.formula}</p>
                     </div>
@@ -1435,17 +1452,17 @@
                     <div class="space-y-2">
                         <label class="block text-xs font-bold text-gray-700"><i class="fa-solid fa-pen text-brand-primary mr-1"></i>STEP 2. 최종 계산 수치 입력</label>
                         <div class="flex space-x-2">
-                            <input type="number" id="calc-practice-input" placeholder="숫자만 입력 (예: 20)" class="flex-1 border border-gray-300 rounded-xl px-3 py-2 text-base font-bold text-brand-dark focus:outline-none focus:border-brand-primary">
-                            <button onclick="checkCalcPracticeAnswer('${currentQ.id}')" class="bg-brand-primary text-white font-bold px-4 rounded-xl shadow text-sm">
+                            <input type="number" id="calc-practice-input" placeholder="숫자만 입력 (예: 20)" class="flex-1 border border-gray-300 rounded-2xl px-4 py-2.5 text-base font-black text-brand-dark focus:outline-none focus:border-brand-primary">
+                            <button onclick="checkCalcPracticeAnswer('${currentQ.id}')" class="bg-brand-primary text-white font-black px-5 rounded-2xl shadow-md text-sm">
                                 제출
                             </button>
                         </div>
                     </div>
 
-                    <div id="calc-practice-result" class="hidden p-3 rounded-xl text-xs space-y-2"></div>
+                    <div id="calc-practice-result" class="hidden p-3.5 rounded-2xl text-xs space-y-2"></div>
 
                     <div class="flex justify-end pt-2">
-                        <button onclick="nextCalcPractice()" class="text-xs font-bold text-brand-primary bg-brand-soft px-4 py-2 rounded-xl">
+                        <button onclick="nextCalcPractice()" class="text-xs font-black text-brand-primary bg-brand-soft px-4 py-2.5 rounded-2xl">
                             다음 계산 문제 <i class="fa-solid fa-arrow-right ml-1"></i>
                         </button>
                     </div>
@@ -1465,11 +1482,11 @@
 
             const isCorrect = Math.abs(userVal - q.numericAnswer) < 0.1;
 
-            resBox.classList.remove('hidden', 'bg-red-50', 'bg-green-50', 'text-red-800', 'text-green-800');
+            resBox.classList.remove('hidden', 'bg-red-50', 'bg-emerald-50', 'text-red-800', 'text-emerald-900');
             if (isCorrect) {
-                resBox.classList.add('bg-green-50', 'text-green-800', 'border', 'border-green-200');
+                resBox.classList.add('bg-emerald-50', 'text-emerald-900', 'border', 'border-emerald-200');
                 resBox.innerHTML = `
-                    <p class="font-bold text-sm"><i class="fa-solid fa-circle-check mr-1"></i>정답입니다!</p>
+                    <p class="font-bold text-sm"><i class="fa-solid fa-circle-check text-brand-primary mr-1"></i>정답입니다!</p>
                     <p class="mt-1">${q.explanation}</p>
                 `;
                 recordAnswer(q.id, true, userVal);
@@ -1492,15 +1509,15 @@
         /* MODULE 6: GENERATOR */
         function renderGeneratorModule(container) {
             container.innerHTML = `
-                <div class="bg-white rounded-2xl p-4 shadow-sm space-y-4">
+                <div class="bg-white rounded-3xl p-5 glass-shadow space-y-4 border border-emerald-900/5">
                     <div class="border-b pb-2">
-                        <h3 class="font-bold text-sm text-gray-800"><i class="fa-solid fa-wand-magic-sparkles text-brand-primary mr-1"></i> 맞춤 문제 생성 옵션</h3>
+                        <h3 class="font-black text-sm text-brand-dark"><i class="fa-solid fa-wand-magic-sparkles text-brand-primary mr-1"></i> 맞춤 문제 생성 옵션</h3>
                     </div>
 
                     <div class="space-y-3 text-xs">
                         <div>
                             <label class="block font-bold text-gray-700 mb-1">시험 영역 선택</label>
-                            <select id="gen-part" class="w-full bg-gray-100 border border-gray-200 rounded-xl p-2 font-semibold">
+                            <select id="gen-part" class="w-full bg-brand-bg border border-emerald-900/10 rounded-2xl p-2.5 font-bold text-brand-dark">
                                 <option value="all">전체 (1부 + 2부)</option>
                                 <option value="1">신용분석사 1부 (회계/재무)</option>
                                 <option value="2">신용분석사 2부 (평가/현금)</option>
@@ -1509,7 +1526,7 @@
 
                         <div>
                             <label class="block font-bold text-gray-700 mb-1">난이도 설정</label>
-                            <select id="gen-diff" class="w-full bg-gray-100 border border-gray-200 rounded-xl p-2 font-semibold">
+                            <select id="gen-diff" class="w-full bg-brand-bg border border-emerald-900/10 rounded-2xl p-2.5 font-bold text-brand-dark">
                                 <option value="all">전체 난이도</option>
                                 <option value="초급">초급 (기본 암기)</option>
                                 <option value="중급">중급 (수치 대입)</option>
@@ -1519,7 +1536,7 @@
                         </div>
                     </div>
 
-                    <button onclick="generateCustomQuiz()" class="w-full bg-brand-primary text-white font-bold py-3 rounded-xl text-sm shadow hover:bg-brand-dark transition">
+                    <button onclick="generateCustomQuiz()" class="w-full bg-brand-primary text-white font-black py-3.5 rounded-2xl text-sm shadow-md hover:bg-brand-dark transition">
                         문제 생성 및 시작
                     </button>
 
@@ -1540,7 +1557,7 @@
 
             const targetBox = document.getElementById('generated-quiz-area');
             if (filtered.length === 0) {
-                targetBox.innerHTML = '<p class="text-xs text-gray-400 text-center py-4">조건에 맞는 문제가 없습니다. 조건을 변경해주세요.</p>';
+                targetBox.innerHTML = '<p class="text-xs text-brand-muted text-center py-4">조건에 맞는 문제가 없습니다. 조건을 변경해주세요.</p>';
                 return;
             }
 
@@ -1555,12 +1572,12 @@
 
             container.innerHTML = `
                 <div class="space-y-3">
-                    <div class="bg-white rounded-2xl p-4 shadow-sm flex justify-between items-center">
+                    <div class="bg-white rounded-3xl p-4.5 glass-shadow flex justify-between items-center border border-emerald-900/5">
                         <div>
-                            <h3 class="font-bold text-sm text-gray-800"><i class="fa-solid fa-book-bookmark text-brand-danger mr-1"></i> 누적 오답 노트</h3>
-                            <p class="text-xs text-gray-500">반복 틀린 문제를 집중 복습하세요.</p>
+                            <h3 class="font-black text-sm text-brand-dark"><i class="fa-solid fa-book-bookmark text-brand-danger mr-1.5"></i> 누적 오답 노트</h3>
+                            <p class="text-xs text-brand-muted">반복 틀린 문제를 집중 복습하세요.</p>
                         </div>
-                        <span class="text-lg font-extrabold text-brand-danger bg-red-50 px-3 py-1 rounded-xl">${wrongList.length}개</span>
+                        <span class="text-lg font-black text-brand-danger bg-red-50 px-3.5 py-1 rounded-2xl">${wrongList.length}개</span>
                     </div>
 
                     <div id="wrong-notes-list" class="space-y-3"></div>
@@ -1570,10 +1587,10 @@
             const listEl = document.getElementById('wrong-notes-list');
             if (wrongList.length === 0) {
                 listEl.innerHTML = `
-                    <div class="bg-white rounded-2xl p-8 text-center space-y-2">
+                    <div class="bg-white rounded-3xl p-8 text-center space-y-2 glass-shadow border border-emerald-900/5">
                         <i class="fa-solid fa-circle-check text-brand-light text-3xl"></i>
-                        <p class="text-sm font-bold text-gray-700">현재 오답이 없습니다!</p>
-                        <p class="text-xs text-gray-400">문제를 풀고 틀린 항목은 자동으로 이곳에 보관됩니다.</p>
+                        <p class="text-sm font-black text-brand-dark">현재 오답이 없습니다!</p>
+                        <p class="text-xs text-brand-muted">문제를 풀고 틀린 항목은 자동으로 이곳에 보관됩니다.</p>
                     </div>
                 `;
                 return;
@@ -1584,19 +1601,19 @@
                 if (!q) return;
 
                 const card = document.createElement('div');
-                card.className = 'bg-white rounded-2xl p-4 shadow-sm space-y-3 border-l-4 border-brand-danger';
+                card.className = 'bg-white rounded-3xl p-4.5 glass-shadow space-y-3 border-l-4 border-brand-danger border-emerald-900/5';
                 card.innerHTML = `
-                    <div class="flex justify-between text-xs font-semibold text-gray-500">
+                    <div class="flex justify-between text-xs font-bold text-brand-muted">
                         <span>[${q.part}부] ${q.subject}</span>
-                        <span class="text-brand-danger font-bold">틀린 횟수: ${w.wrongCount}회</span>
+                        <span class="text-brand-danger font-black">틀린 횟수: ${w.wrongCount}회</span>
                     </div>
-                    <p class="text-sm font-bold text-gray-800">${q.question}</p>
-                    <div class="bg-brand-bg p-2 rounded-xl text-xs space-y-1">
-                        <span class="font-bold text-brand-dark">정답: ${q.answer}</span>
-                        <p class="text-gray-600">${q.explanation}</p>
+                    <p class="text-sm font-black text-brand-dark">${q.question}</p>
+                    <div class="bg-brand-bg p-3 rounded-2xl text-xs space-y-1 border border-emerald-900/10">
+                        <span class="font-black text-brand-dark">정답: ${q.answer}</span>
+                        <p class="text-brand-muted">${q.explanation}</p>
                     </div>
                     <div class="flex justify-end space-x-2 pt-1">
-                        <button onclick="resolveWrongQuestion('${q.id}')" class="text-xs font-bold text-brand-primary bg-brand-soft px-3 py-1.5 rounded-lg">
+                        <button onclick="resolveWrongQuestion('${q.id}')" class="text-xs font-black text-brand-primary bg-brand-soft px-3.5 py-2 rounded-xl">
                             복습 완료 처리
                         </button>
                     </div>
@@ -1616,9 +1633,9 @@
         function renderDictionaryModule(container, highlightId) {
             container.innerHTML = `
                 <div class="space-y-3">
-                    <div class="bg-white rounded-2xl p-4 shadow-sm space-y-2">
-                        <h3 class="font-bold text-sm text-gray-800"><i class="fa-solid fa-spell-check text-brand-primary mr-1"></i> 종합 신용평가 공식 사전</h3>
-                        <input type="text" id="dict-search" onkeyup="filterDictList()" placeholder="공식명 검색 (예: ROE, 부채비율)" class="w-full bg-gray-100 border rounded-xl p-2 text-xs">
+                    <div class="bg-white rounded-3xl p-4.5 glass-shadow space-y-2 border border-emerald-900/5">
+                        <h3 class="font-black text-sm text-brand-dark"><i class="fa-solid fa-spell-check text-brand-primary mr-1.5"></i> 종합 신용평가 공식 사전</h3>
+                        <input type="text" id="dict-search" onkeyup="filterDictList()" placeholder="공식명 검색 (예: ROE, 부채비율)" class="w-full bg-brand-bg border border-emerald-900/10 rounded-2xl p-2.5 text-xs font-bold text-brand-dark">
                     </div>
 
                     <div id="dict-list" class="space-y-3"></div>
@@ -1638,28 +1655,28 @@
 
             filtered.forEach(f => {
                 const card = document.createElement('div');
-                card.className = 'bg-white rounded-2xl p-4 shadow-sm space-y-3 border border-gray-100';
+                card.className = 'bg-white rounded-3xl p-4.5 glass-shadow space-y-3 border border-emerald-900/5';
                 card.innerHTML = `
                     <div class="flex justify-between items-center border-b pb-2">
-                        <span class="font-bold text-base text-brand-dark">${f.name}</span>
-                        <span class="text-xs font-bold text-brand-primary bg-brand-soft px-2 py-0.5 rounded-md">${f.cat}</span>
+                        <span class="font-black text-base text-brand-dark">${f.name}</span>
+                        <span class="text-xs font-black text-brand-primary bg-brand-soft px-2.5 py-0.5 rounded-lg">${f.cat}</span>
                     </div>
-                    <div class="space-y-2 text-xs text-gray-700">
-                        <div class="bg-brand-bg p-2 rounded-xl">
+                    <div class="space-y-2 text-xs text-brand-dark">
+                        <div class="bg-brand-bg p-2.5 rounded-2xl border border-emerald-900/10">
                             <span class="text-brand-primary font-bold">산식:</span> <span class="font-mono font-bold text-sm">${f.formula}</span>
                         </div>
                         <p><strong>· 분자:</strong> ${f.num}</p>
                         <p><strong>· 분모:</strong> ${f.den}</p>
                         <p><strong>· 의미:</strong> ${f.meaning}</p>
                         <div class="grid grid-cols-2 gap-2 pt-1 text-[11px]">
-                            <div class="bg-emerald-50 text-emerald-800 p-2 rounded-lg">
+                            <div class="bg-emerald-50 text-emerald-900 p-2.5 rounded-xl border border-emerald-100">
                                 <span class="font-bold">높을 때:</span> ${f.highMeaning}
                             </div>
-                            <div class="bg-rose-50 text-rose-800 p-2 rounded-lg">
+                            <div class="bg-rose-50 text-rose-900 p-2.5 rounded-xl border border-rose-100">
                                 <span class="font-bold">낮을 때:</span> ${f.lowMeaning}
                             </div>
                         </div>
-                        <p class="text-[11px] text-gray-500 bg-gray-50 p-2 rounded-lg"><strong>실전 예제:</strong> ${f.ex}</p>
+                        <p class="text-[11px] text-brand-muted bg-gray-50 p-2.5 rounded-xl"><strong>실전 예제:</strong> ${f.ex}</p>
                     </div>
                 `;
                 listEl.appendChild(card);
@@ -1674,19 +1691,19 @@
 
             container.innerHTML = `
                 <div class="space-y-4">
-                    <div class="bg-white rounded-2xl p-4 shadow-sm text-center space-y-2">
-                        <h3 class="font-bold text-sm text-gray-700">전체 학습 성과 종합 분석</h3>
-                        <div class="text-4xl font-extrabold text-brand-primary my-2">${accuracy}%</div>
-                        <p class="text-xs text-gray-500">총 ${totalSolved}문제 중 ${correctCount}개 정답</p>
+                    <div class="bg-white rounded-3xl p-6 glass-shadow text-center space-y-2 border border-emerald-900/5">
+                        <h3 class="font-black text-sm text-brand-muted">전체 학습 성과 종합 분석</h3>
+                        <div class="text-4xl font-black text-brand-primary my-2">${accuracy}%</div>
+                        <p class="text-xs text-brand-muted">총 ${totalSolved}문제 중 ${correctCount}개 정답</p>
                     </div>
 
-                    <div class="bg-white rounded-2xl p-4 shadow-sm space-y-3 text-xs">
-                        <h4 class="font-bold text-sm text-gray-800">공식 암기 마스터율</h4>
+                    <div class="bg-white rounded-3xl p-5 glass-shadow space-y-3 text-xs border border-emerald-900/5">
+                        <h4 class="font-black text-sm text-brand-dark">공식 암기 마스터율</h4>
                         <div class="flex items-center space-x-3">
-                            <div class="flex-1 bg-gray-100 rounded-full h-3">
+                            <div class="flex-1 bg-gray-100 rounded-full h-3 overflow-hidden">
                                 <div class="bg-brand-light h-3 rounded-full" style="width: ${Math.round((appState.masteredFormulas.length / FORMULA_DB.length) * 100)}%"></div>
                             </div>
-                            <span class="font-bold text-brand-dark">${appState.masteredFormulas.length} / ${FORMULA_DB.length}개</span>
+                            <span class="font-black text-brand-dark">${appState.masteredFormulas.length} / ${FORMULA_DB.length}개</span>
                         </div>
                     </div>
                 </div>
@@ -1699,12 +1716,14 @@
 
         function renderMockExamModule(container) {
             container.innerHTML = `
-                <div class="bg-white rounded-2xl p-4 shadow-sm space-y-4 text-center">
-                    <i class="fa-solid fa-stopwatch text-brand-primary text-4xl"></i>
-                    <h3 class="font-bold text-lg text-gray-800">신용분석사 실전 모의고사</h3>
-                    <p class="text-xs text-gray-500">10분 간 실전과 동일한 환경에서 랜덤 추출된 5문제를 풀이합니다.</p>
-                    <button onclick="startMockExam()" class="bg-brand-primary text-white font-bold px-6 py-3 rounded-xl shadow text-sm">
-                        시험 시작하기
+                <div class="bg-white rounded-3xl p-6 glass-shadow space-y-4 text-center border border-emerald-900/5">
+                    <div class="w-16 h-16 rounded-full bg-red-50 text-red-600 flex items-center justify-center mx-auto text-2xl font-bold">
+                        <i class="fa-solid fa-stopwatch"></i>
+                    </div>
+                    <h3 class="font-black text-lg text-brand-dark">신용분석사 실전 모의고사</h3>
+                    <p class="text-xs text-brand-muted">10분 간 실전과 동일한 환경에서 추출된 문제를 제한 시간 내에 제출하세요.</p>
+                    <button onclick="startMockExam()" class="bg-brand-primary text-white font-black px-6 py-3.5 rounded-2xl shadow-lg text-sm">
+                        모의고사 시작하기
                     </button>
                     <div id="mock-exam-area" class="text-left space-y-4 pt-4"></div>
                 </div>
@@ -1714,12 +1733,12 @@
         function startMockExam() {
             const area = document.getElementById('mock-exam-area');
             area.innerHTML = `
-                <div class="bg-brand-dark text-white p-3 rounded-xl flex justify-between items-center text-xs font-bold mb-3">
-                    <span><i class="fa-solid fa-clock mr-1"></i>남은 시간</span>
-                    <span id="mock-timer-display" class="font-mono text-sm text-brand-accent">10:00</span>
+                <div class="bg-brand-dark text-white p-3.5 rounded-2xl flex justify-between items-center text-xs font-black mb-3 border border-emerald-700/30">
+                    <span><i class="fa-solid fa-clock mr-1 text-brand-gold"></i>남은 시간</span>
+                    <span id="mock-timer-display" class="font-mono text-sm text-brand-gold">10:00</span>
                 </div>
                 <div id="mock-quiz-list" class="space-y-4"></div>
-                <button onclick="finishMockExam()" class="w-full bg-brand-primary text-white font-bold py-3 rounded-xl text-sm shadow mt-4">
+                <button onclick="finishMockExam()" class="w-full bg-brand-primary text-white font-black py-3.5 rounded-2xl text-sm shadow-lg mt-4">
                     답안 최종 제출
                 </button>
             `;
@@ -1748,7 +1767,7 @@
 
         function finishMockExam() {
             clearInterval(mockTimer);
-            showToast('모의고사가 제출되었습니다!');
+            showToast('모의고사가 성공적으로 제출되었습니다!');
             navTo('analytics');
         }
 
@@ -1761,14 +1780,14 @@
             if (!container) return;
 
             const box = document.createElement('div');
-            box.className = 'bg-white rounded-2xl p-4 shadow-sm border border-gray-100 space-y-3';
+            box.className = 'bg-white rounded-3xl p-4.5 glass-shadow space-y-3 border border-emerald-900/5';
 
             let optionsHTML = '';
             if (q.type === 'mcq' || q.type === 'calc') {
                 optionsHTML = `
                     <div class="space-y-2 pt-2">
                         ${q.options.map((opt, i) => `
-                            <button onclick="submitAnswer('${q.id}', '${opt}')" class="w-full text-left p-2.5 bg-brand-bg rounded-xl text-xs font-semibold text-gray-700 hover:bg-brand-soft hover:text-brand-dark transition border border-gray-200">
+                            <button onclick="submitAnswer('${q.id}', '${opt}')" class="w-full text-left p-3 bg-brand-bg rounded-2xl text-xs font-bold text-brand-dark hover:bg-brand-soft transition border border-emerald-900/10">
                                 ${i + 1}. ${opt}
                             </button>
                         `).join('')}
@@ -1777,27 +1796,27 @@
             } else if (q.type === 'ox') {
                 optionsHTML = `
                     <div class="grid grid-cols-2 gap-3 pt-2">
-                        <button onclick="submitAnswer('${q.id}', 'O')" class="p-3 bg-brand-bg rounded-xl font-bold text-lg text-brand-primary border border-gray-200 hover:bg-brand-soft">O</button>
-                        <button onclick="submitAnswer('${q.id}', 'X')" class="p-3 bg-brand-bg rounded-xl font-bold text-lg text-brand-danger border border-gray-200 hover:bg-red-50">X</button>
+                        <button onclick="submitAnswer('${q.id}', 'O')" class="p-3 bg-brand-bg rounded-2xl font-black text-lg text-brand-primary border border-emerald-900/10 hover:bg-brand-soft">O</button>
+                        <button onclick="submitAnswer('${q.id}', 'X')" class="p-3 bg-brand-bg rounded-2xl font-black text-lg text-brand-danger border border-emerald-900/10 hover:bg-red-50">X</button>
                     </div>
                 `;
             } else if (q.type === 'fill') {
                 optionsHTML = `
                     <div class="flex space-x-2 pt-2">
-                        <input type="text" id="fill-in-${q.id}" placeholder="정답 입력" class="flex-1 border rounded-xl px-3 py-2 text-xs font-bold">
-                        <button onclick="submitAnswer('${q.id}', document.getElementById('fill-in-${q.id}').value)" class="bg-brand-primary text-white font-bold px-4 rounded-xl text-xs">확인</button>
+                        <input type="text" id="fill-in-${q.id}" placeholder="정답 입력" class="flex-1 border rounded-2xl px-3.5 py-2 text-xs font-bold text-brand-dark">
+                        <button onclick="submitAnswer('${q.id}', document.getElementById('fill-in-${q.id}').value)" class="bg-brand-primary text-white font-black px-4 rounded-2xl text-xs">확인</button>
                     </div>
                 `;
             }
 
             box.innerHTML = `
                 <div class="flex justify-between items-center text-xs">
-                    <span class="font-bold text-brand-primary">[${q.part}부] ${q.subject}</span>
-                    <span class="text-gray-400 font-semibold">난이도: ${q.difficulty}</span>
+                    <span class="font-black text-brand-primary">[${q.part}부] ${q.subject}</span>
+                    <span class="text-brand-muted font-semibold">난이도: ${q.difficulty}</span>
                 </div>
-                <h4 class="font-bold text-sm text-gray-800 leading-relaxed">${q.question}</h4>
+                <h4 class="font-black text-sm text-brand-dark leading-relaxed">${q.question}</h4>
                 ${optionsHTML}
-                <div id="ans-feedback-${q.id}" class="hidden p-3 rounded-xl text-xs space-y-1"></div>
+                <div id="ans-feedback-${q.id}" class="hidden p-3.5 rounded-2xl text-xs space-y-1"></div>
             `;
 
             container.appendChild(box);
@@ -1810,18 +1829,18 @@
 
             const isCorrect = userAns.toString().trim() === q.answer.toString().trim();
 
-            feedbackBox.classList.remove('hidden', 'bg-red-50', 'bg-green-50', 'text-red-800', 'text-green-800');
+            feedbackBox.classList.remove('hidden', 'bg-red-50', 'bg-emerald-50', 'text-red-800', 'text-emerald-900');
             if (isCorrect) {
-                feedbackBox.classList.add('bg-green-50', 'text-green-800', 'border', 'border-green-200');
+                feedbackBox.classList.add('bg-emerald-50', 'text-emerald-900', 'border', 'border-emerald-200');
                 feedbackBox.innerHTML = `
-                    <p class="font-bold"><i class="fa-solid fa-circle-check mr-1"></i>정답입니다!</p>
+                    <p class="font-black"><i class="fa-solid fa-circle-check text-brand-primary mr-1"></i>정답입니다!</p>
                     <p class="mt-1">${q.explanation}</p>
                 `;
                 recordAnswer(qId, true, userAns);
             } else {
                 feedbackBox.classList.add('bg-red-50', 'text-red-800', 'border', 'border-red-200');
                 feedbackBox.innerHTML = `
-                    <p class="font-bold"><i class="fa-solid fa-circle-xmark mr-1"></i>오답입니다.</p>
+                    <p class="font-black"><i class="fa-solid fa-circle-xmark mr-1"></i>오답입니다.</p>
                     <p class="mt-1"><strong>정답:</strong> ${q.answer}</p>
                     <p class="mt-1">${q.explanation}</p>
                 `;
@@ -1861,8 +1880,7 @@
            ========================================================================== */
 
         function toggleSearchModal() {
-            const modal = document.getElementById('modal-search');
-            modal.classList.toggle('hidden');
+            document.getElementById('modal-search').classList.toggle('hidden');
         }
 
         function handleGlobalSearch() {
@@ -1870,7 +1888,7 @@
             const resEl = document.getElementById('search-results');
 
             if (!query) {
-                resEl.innerHTML = '<p class="text-center text-xs text-gray-400 py-4">검색어를 입력하세요.</p>';
+                resEl.innerHTML = '<p class="text-center text-xs text-brand-muted py-4">검색어를 입력하세요.</p>';
                 return;
             }
 
@@ -1879,14 +1897,14 @@
 
             matchedFormulas.forEach(f => {
                 const item = document.createElement('div');
-                item.className = 'p-2.5 bg-gray-50 rounded-xl cursor-pointer hover:bg-brand-soft';
+                item.className = 'p-3 bg-brand-bg rounded-2xl cursor-pointer hover:bg-brand-soft border border-emerald-900/5';
                 item.onclick = () => {
                     toggleSearchModal();
                     navTo('dictionary', { formulaId: f.id });
                 };
                 item.innerHTML = `
-                    <p class="font-bold text-xs text-brand-dark">${f.name}</p>
-                    <p class="text-[10px] text-gray-500 font-mono">${f.formula}</p>
+                    <p class="font-black text-xs text-brand-dark">${f.name}</p>
+                    <p class="text-[10px] text-brand-muted font-mono">${f.formula}</p>
                 `;
                 resEl.appendChild(item);
             });
@@ -1943,7 +1961,7 @@
             const toast = document.getElementById('toast');
             document.getElementById('toast-msg').textContent = msg;
             toast.classList.remove('opacity-0');
-            setTimeout(() => toast.classList.add('opacity-0'), 2000);
+            setTimeout(() => toast.classList.add('opacity-0'), 2200);
         }
 
         /* INITIALIZATION */
